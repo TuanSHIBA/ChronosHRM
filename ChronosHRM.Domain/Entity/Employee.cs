@@ -1,4 +1,5 @@
 ﻿using Chronos.Domain.Common;
+using Chronos.Domain.Entities;
 using Chronos.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -25,14 +26,14 @@ namespace Chronos.Domain.Entity
         public EmployeeStatus Status { get; set; } = EmployeeStatus.Probation;
 
         // Foreign Key: Phòng ban
-        public int DepartmentId { get; set; }
+        public Guid DepartmentId { get; set; }
         public Department? Department { get; set; }
 
         // Self-Referencing: Quản lý trực tiếp (Manager)
-        public int? ManagerId { get; set; }
+        public Guid? ManagerId { get; set; }
         public Employee? Manager { get; set; }
 
         // Quan hệ 1-N: Một nhân viên có nhiều hợp đồng (Lịch sử lương)
-        public ICollection<Contract> Contracts { get; set; } = new List<Contract>();
+        public ICollection<EmploymentContract> Contracts { get; set; } = new List<EmploymentContract>();
     }
 }
