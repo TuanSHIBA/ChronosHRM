@@ -1,4 +1,4 @@
-﻿namespace ChronosHRM.Domain
+﻿namespace Chronos.Infrastructure
 {
     public class Class1
     {
