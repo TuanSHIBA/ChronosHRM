@@ -9,10 +9,12 @@ using System.Threading.Tasks;
 using Chronos.Domain.Entity;
 using Chronos.Domain.Common;
 using Chronos.Domain.Entities;
+using Chronos.Domain.Entity.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Chronos.Persistence.Context
 {
-    public class ChronosDbContext : DbContext
+    public class ChronosDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
     {
         public ChronosDbContext(DbContextOptions<ChronosDbContext> options) : base(options)
         {

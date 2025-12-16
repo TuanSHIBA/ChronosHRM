@@ -3,12 +3,17 @@ using Chronos.Application.Interfaces;
 using Chronos.Application.Interfaces.IServices;
 using Chronos.Application.Mappings;
 using Chronos.Application.Services;
+using Chronos.Domain.Entity.Identity;
 using Chronos.Persistence.Context;
 using Chronos.Persistence.Repositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Scalar.AspNetCore; // 👈 Nhớ using cái này
+using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
+using System.Text; // 👈 Nhớ using cái này
 
 namespace ChronosHRM.API
 {
@@ -39,6 +44,45 @@ namespace ChronosHRM.API
             // 4. FluentValidation
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddValidatorsFromAssembly(typeof(IEmployeeService).Assembly);
+
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+            builder.Services.AddSingleton(jwtSettings); // Đăng ký để tiêm vào Service sau này
+
+            // 2. Cấu hình Identity (User/Role/Pass)
+            builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+            {
+                options.Password.RequireDigit = false; // Demo cho dễ, thực tế nên để true
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 6; // Pass tối thiểu 6 ký tự
+            })
+            .AddEntityFrameworkStores<ChronosDbContext>()
+            .AddDefaultTokenProviders();
+
+            // 3. Cấu hình xác thực JWT (Authentication)
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
+                };
+            });
+
+
+
 
             var app = builder.Build();
 
