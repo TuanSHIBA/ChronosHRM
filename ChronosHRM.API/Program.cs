@@ -1,4 +1,5 @@
-﻿using Chronos.Application.DTOs.Employee;
+﻿using Chronos.Application.Common.Settings;
+using Chronos.Application.DTOs.Employee;
 using Chronos.Application.Interfaces;
 using Chronos.Application.Interfaces.IServices;
 using Chronos.Application.Mappings;
@@ -13,7 +14,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
-using System.Text; // 👈 Nhớ using cái này
+using System.Text;
+using System.Text.Json; // 👈 Nhớ using cái này
 
 namespace ChronosHRM.API
 {
@@ -34,28 +36,25 @@ namespace ChronosHRM.API
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IEmployeeService, EmployeeService>();
             builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddControllers();
 
-            // ==========================================
-            // 👇 CHUẨN .NET 9: Dùng Native OpenAPI
-            // ==========================================
             builder.Services.AddOpenApi();
 
-            // 4. FluentValidation
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddValidatorsFromAssembly(typeof(IEmployeeService).Assembly);
 
             var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
-            builder.Services.AddSingleton(jwtSettings); // Đăng ký để tiêm vào Service sau này
+            builder.Services.AddSingleton(jwtSettings); 
 
-            // 2. Cấu hình Identity (User/Role/Pass)
+            // 2. Cấu hình Identity
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
-                options.Password.RequireDigit = false; // Demo cho dễ, thực tế nên để true
+                options.Password.RequireDigit = false; 
                 options.Password.RequireLowercase = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
-                options.Password.RequiredLength = 6; // Pass tối thiểu 6 ký tự
+                options.Password.RequiredLength = 6; 
             })
             .AddEntityFrameworkStores<ChronosDbContext>()
             .AddDefaultTokenProviders();
@@ -77,7 +76,39 @@ namespace ChronosHRM.API
 
                     ValidIssuer = jwtSettings.Issuer,
                     ValidAudience = jwtSettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
+                    ClockSkew = TimeSpan.Zero
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    // Khi Authentication thất bại (Hết hạn, sai token...)
+                    OnChallenge = context =>
+                    {
+                        // Bỏ qua behavior mặc định
+                        context.HandleResponse();
+
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        context.Response.ContentType = "application/json";
+
+                        // Kiểm tra xem lỗi cụ thể là gì
+                        var message = "Bạn chưa đăng nhập hoặc Token không hợp lệ.";
+
+                        if (context.AuthenticateFailure != null &&
+                            context.AuthenticateFailure.GetType() == typeof(SecurityTokenExpiredException))
+                        {
+                            message = "Token đã hết hạn. Vui lòng Refresh Token.";
+                        }
+
+                        // Trả về JSON tùy chỉnh
+                        var result = JsonSerializer.Serialize(new
+                        {
+                            message = message,
+                            statusCode = 401
+                        });
+
+                        return context.Response.WriteAsync(result);
+                    }
                 };
             });
 

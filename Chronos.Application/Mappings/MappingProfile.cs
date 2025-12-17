@@ -20,6 +20,7 @@ namespace Chronos.Application.Mappings
 
             CreateMap<Department, DepartmentDto>().ReverseMap();
             CreateMap<CreateDepartmentDto, Department>();
+            CreateMap<UpdateDepartmentDto, Department>();
         }
     }
 }

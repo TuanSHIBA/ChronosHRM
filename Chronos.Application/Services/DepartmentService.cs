@@ -1,63 +1,92 @@
 ﻿using AutoMapper;
+using Chronos.Application.Common.Models;
+using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using Chronos.Application.DTOs.Department;
-using Chronos.Application.Interfaces.IServices;
 using Chronos.Application.Interfaces;
+using Chronos.Application.Interfaces.IServices;
+
+// using Chronos.Application.Interfaces.Repositories; // 👈 Bỏ dòng này
+using Chronos.Domain.Entities;
 using Chronos.Domain.Entity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Chronos.Application.Services
 {
-    public class DepartmentService(IUnitOfWork unitOfWork, IMapper mapper) : IDepartmentService
+    public class DepartmentService : IDepartmentService
     {
-        public async Task<IEnumerable<DepartmentDto>> GetAllAsync()
+        private readonly IUnitOfWork _unitOfWork; // 👈 Thay Repo bằng UoW
+        private readonly IMapper _mapper;
+
+        public DepartmentService(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            var departments = await unitOfWork.Departments.GetAllAsync();
-            return mapper.Map<IEnumerable<DepartmentDto>>(departments);
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public async Task<DepartmentDto?> GetByIdAsync(Guid id)
+        // 1. LẤY DANH SÁCH
+        public async Task<ServiceResponse<List<DepartmentDto>>> GetAllAsync()
         {
-            var dept = await unitOfWork.Departments.GetByIdAsync(id);
-            return mapper.Map<DepartmentDto>(dept);
+            // Gọi qua UnitOfWork.Departments
+            var departments = await _unitOfWork.Departments.GetAllAsync();
+            var result = _mapper.Map<List<DepartmentDto>>(departments);
+            return ServiceResponse<List<DepartmentDto>>.SuccessResponse(result);
         }
 
-        public async Task<Guid> CreateAsync(CreateDepartmentDto request)
+        // 2. LẤY CHI TIẾT
+        public async Task<ServiceResponse<DepartmentDto>> GetByIdAsync(Guid id)
         {
-            var dept = mapper.Map<Department>(request);
-            dept.CreatedAt = DateTime.Now; // Hoặc CreatedAt tùy BaseEntity của bạn
+            var department = await _unitOfWork.Departments.GetByIdAsync(id);
+            if (department == null)
+                return ServiceResponse<DepartmentDto>.ErrorResponse("Phòng ban không tồn tại.");
 
-            await unitOfWork.Departments.AddAsync(dept);
-            await unitOfWork.SaveChangesAsync();
-
-            return dept.Id;
+            var result = _mapper.Map<DepartmentDto>(department);
+            return ServiceResponse<DepartmentDto>.SuccessResponse(result);
         }
 
-        public async Task UpdateAsync(Guid id, CreateDepartmentDto request)
+        // 3. TẠO MỚI (Dùng Transaction của UoW)
+        public async Task<ServiceResponse<DepartmentDto>> CreateAsync(CreateDepartmentDto request)
         {
-            var repo = unitOfWork.Departments;
-            var dept = await repo.GetByIdAsync(id);
-            if (dept == null) throw new Exception("Không tìm thấy!");
+            var existingDept = await _unitOfWork.Departments.GetByCodeAsync(request.Code);
+            if (existingDept != null)
+                return ServiceResponse<DepartmentDto>.ErrorResponse($"Mã phòng '{request.Code}' đã tồn tại.");
 
-            dept.Code = request.Code;
-            dept.Name = request.Name;
+            var department = _mapper.Map<Department>(request);
 
-             repo.Update(dept);
-            await unitOfWork.SaveChangesAsync();
+            // Bước 1: Add vào bộ nhớ
+            await _unitOfWork.Departments.AddAsync(department);
+
+            // Bước 2: Commit Transaction (Lưu xuống DB)
+            await _unitOfWork.SaveChangesAsync();
+
+            var result = _mapper.Map<DepartmentDto>(department);
+            return ServiceResponse<DepartmentDto>.SuccessResponse(result, "Tạo phòng ban thành công.");
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task<ServiceResponse<DepartmentDto>> UpdateAsync(UpdateDepartmentDto request)
         {
-            var repo = unitOfWork.Departments;
-            var dept = await repo.GetByIdAsync(id);
-            if (dept != null)
-            {
-                 repo.Delete(dept);
-                await unitOfWork.SaveChangesAsync();
-            }
+            var department = await _unitOfWork.Departments.GetByIdAsync(request.Id);
+            if (department == null)
+                return ServiceResponse<DepartmentDto>.ErrorResponse("Phòng ban không tồn tại.");
+
+            department.Name = request.Name;
+
+            _unitOfWork.Departments.Update(department);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            var result = _mapper.Map<DepartmentDto>(department);
+            return ServiceResponse<DepartmentDto>.SuccessResponse(result, "Cập nhật thành công.");
+        }
+        public async Task<ServiceResponse<bool>> DeleteAsync(Guid id)
+        {
+            var department = await _unitOfWork.Departments.GetByIdAsync(id);
+            if (department == null)
+                return ServiceResponse<bool>.ErrorResponse("Phòng ban không tồn tại.");
+
+            _unitOfWork.Departments.Delete(department);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return ServiceResponse<bool>.SuccessResponse(true, "Xóa thành công.");
         }
     }
 }
