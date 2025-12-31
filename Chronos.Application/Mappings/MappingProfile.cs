@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Chronos.Application.DTOs.Department;
 using Chronos.Application.DTOs.Employee;
+using Chronos.Application.DTOs.EmploymentContract;
+using Chronos.Domain.Entities;
 using Chronos.Domain.Entity;
 using System;
 using System.Collections.Generic;
@@ -21,6 +23,10 @@ namespace Chronos.Application.Mappings
             CreateMap<Department, DepartmentDto>().ReverseMap();
             CreateMap<CreateDepartmentDto, Department>();
             CreateMap<UpdateDepartmentDto, Department>();
+
+            CreateMap<EmploymentContractDto, EmploymentContract>().ReverseMap();
+            CreateMap<EmploymentContract,CreateEmploymentContractDto>().ReverseMap();
+
         }
     }
 }

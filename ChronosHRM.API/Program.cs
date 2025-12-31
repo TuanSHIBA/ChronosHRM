@@ -36,6 +36,7 @@ namespace ChronosHRM.API
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IEmployeeService, EmployeeService>();
             builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+            builder.Services.AddScoped<IEmploymentContractService, EmploymentContractService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddControllers();
 
@@ -112,9 +113,17 @@ namespace ChronosHRM.API
                 };
             });
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
 
-
-
+      
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -123,8 +132,10 @@ namespace ChronosHRM.API
                 app.MapOpenApi(); // Tạo ra file JSON tại /openapi/v1.json
                 app.MapScalarApiReference(); // Tạo giao diện Web tại /scalar/v1
             }
-
+         
             app.UseHttpsRedirection();
+            app.UseCors("AllowAllOrigins");
+            app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
 

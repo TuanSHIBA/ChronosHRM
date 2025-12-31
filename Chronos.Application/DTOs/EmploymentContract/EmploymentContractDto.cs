@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace Chronos.Application.DTOs.EmploymentContract
 {
-    public class CreateEmploymentContractDto
+    public class EmploymentContractDto
     {
+        public Guid Id { get; set; }
+        public string ContractCode { get; set; } // Quan trọng: Client cần biết cái này ngay
         public Guid EmployeeId { get; set; }
-        public string ContractCode { get; set; } = string.Empty;
         public ContractType ContractType { get; set; }
+        public ContractStatus Status { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public decimal BaseSalary { get; set; }
-        public SalaryType SalaryType { get; set; }
-        public decimal? InsuranceSalary { get; set; }
     }
 }

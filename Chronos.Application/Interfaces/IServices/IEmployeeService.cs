@@ -1,16 +1,18 @@
-﻿using Chronos.Application.DTOs.Employee;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Chronos.Application.Common.Models; // Import ServiceResponse
+using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
+using Chronos.Application.DTOs.Employee;
 
-namespace Chronos.Application.Interfaces.IServices
+namespace Chronos.Application.Interfaces
 {
     public interface IEmployeeService
     {
-        Task<IEnumerable<EmployeeDto>> GetAllAsync();
-        Task<EmployeeDto?> GetByIdAsync(Guid id);
-        Task<Guid> CreateAsync(CreateEmployeeDto request);
+ 
+        Task<ServiceResponse<List<EmployeeDto>>> GetAllAsync();
+
+        Task<ServiceResponse<EmployeeDto>> GetByIdAsync(Guid id);
+
+        Task<ServiceResponse<EmployeeDto>> CreateAsync(CreateEmployeeDto request);
+        Task<ServiceResponse<EmployeeDto>> UpdateAsync(UpdateEmployeeDto request);
+        Task<ServiceResponse<bool>> DeleteAsync(Guid id);
     }
 }

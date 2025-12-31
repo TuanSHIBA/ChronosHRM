@@ -9,7 +9,6 @@ namespace Chronos.Application.DTOs.Employee
 {
     public class CreateEmployeeDto
     {
-        public string EmployeeCode { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
@@ -18,17 +17,13 @@ namespace Chronos.Application.DTOs.Employee
         public string Address { get; set; }
         public Guid DepartmentId { get; set; }
         public Guid? ManagerId { get; set; }
+        public int Status { get; set; }
     }
 
     public class CreateEmployeeValidator : AbstractValidator<CreateEmployeeDto>
     {
         public CreateEmployeeValidator()
         {
-            // Check Mã NV
-            RuleFor(x => x.EmployeeCode)
-                .NotEmpty().WithMessage("Mã nhân viên không được để trống.")
-                .MaximumLength(10).WithMessage("Mã nhân viên tối đa 10 ký tự.");
-
             RuleFor(x => x.FirstName).NotEmpty().MaximumLength(50);
             RuleFor(x => x.LastName).NotEmpty().MaximumLength(50);
             RuleFor(x => x.Email).NotEmpty().EmailAddress();

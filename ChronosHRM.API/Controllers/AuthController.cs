@@ -33,7 +33,7 @@ namespace Chronos.API.Controllers
             {
                 var token = await authService.LoginAsync(request);
                 // Trả về Token cho Client
-                return Ok(new { token = token });
+                return Ok( token );
             }
             catch (Exception ex)
             {

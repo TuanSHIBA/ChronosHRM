@@ -13,8 +13,13 @@ namespace Chronos.Application.DTOs.Employee
         public string FullName { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
-        public string DepartmentName { get; set; } // Flatten dữ liệu: Lấy tên phòng ban luôn
-        public string Status { get; set; } // Trả về string cho Frontend dễ hiển thị
+        public string DepartmentId { get; set; } 
+        public string DepartmentName { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; } 
+        public DateTime DateOfBirth { get; set; }
+        public string Address { get; set; } 
+        public string Status { get; set; } 
         public string? AvatarUrl { get; set; }
     }
 }

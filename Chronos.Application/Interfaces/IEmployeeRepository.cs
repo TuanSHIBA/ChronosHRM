@@ -12,6 +12,9 @@ namespace Chronos.Application.Interfaces
     {
         Task<Employee?> GetByEmailAsync(string email);
         Task<bool> IsEmailUniqueAsync(string email);
+        Task<Employee?> GetByCodeAsync(string code);
+        Task<List<Employee>> GetEmployeesWithDepartmentAsync();
+        Task<string?> GetLastCodeByPrefixAsync(string prefix);
     }
 
 }

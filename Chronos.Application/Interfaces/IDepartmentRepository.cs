@@ -9,6 +9,6 @@ namespace Chronos.Application.Interfaces
 {
     public interface IDepartmentRepository : IGenericRepository<Department>
     {
- 
+        Task<Department?> GetByCodeAsync(string code);
     }
 }
