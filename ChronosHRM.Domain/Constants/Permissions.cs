@@ -2,7 +2,6 @@
 {
     public static class Permissions
     {
-        // Module Nhân viên
         public static class Employees
         {
             public const string View = "Permissions.Employees.View";
@@ -11,13 +10,19 @@
             public const string Delete = "Permissions.Employees.Delete";
         }
 
-        // Module Phòng ban
         public static class Departments
         {
             public const string View = "Permissions.Departments.View";
             public const string Create = "Permissions.Departments.Create";
             public const string Edit = "Permissions.Departments.Edit";
             public const string Delete = "Permissions.Departments.Delete";
+        }
+        public static class EmploymentContracts
+        {
+            public const string View = "Permissions.EmploymentContracts.View";
+            public const string Create = "Permissions.EmploymentContracts.Create";
+            public const string Edit = "Permissions.EmploymentContracts.Edit";
+            public const string Delete = "Permissions.EmploymentContracts.Delete";
         }
     }
 }

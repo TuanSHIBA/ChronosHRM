@@ -141,8 +141,8 @@ namespace Chronos.Application.Services
             }
 
             // Lấy UserName từ trong Token cũ
-            var userId = principal.FindFirstValue(JwtRegisteredClaimNames.Sub)
-             ?? principal.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var userId =  principal.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (userId == null)
             {

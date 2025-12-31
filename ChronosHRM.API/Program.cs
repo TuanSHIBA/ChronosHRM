@@ -1,4 +1,5 @@
-﻿using Chronos.Application.Common.Settings;
+﻿using Chronos.API.Authorization;
+using Chronos.Application.Common.Settings;
 using Chronos.Application.DTOs.Employee;
 using Chronos.Application.Interfaces;
 using Chronos.Application.Interfaces.IServices;
@@ -10,6 +11,7 @@ using Chronos.Persistence.Repositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -25,6 +27,7 @@ namespace ChronosHRM.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddMemoryCache();
             // 1. DB Context
             builder.Services.AddDbContext<ChronosDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -38,8 +41,12 @@ namespace ChronosHRM.API
             builder.Services.AddScoped<IDepartmentService, DepartmentService>();
             builder.Services.AddScoped<IEmploymentContractService, EmploymentContractService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddControllers();
+            // tài liệu ASP.NET Core Custom Authorization Policy Providers
+            builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+            builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
+            builder.Services.AddControllers();
+            builder.Services.AddAuthorization();
             builder.Services.AddOpenApi();
 
             builder.Services.AddFluentValidationAutoValidation();
