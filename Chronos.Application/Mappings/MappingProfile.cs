@@ -25,6 +25,8 @@ namespace Chronos.Application.Mappings
             CreateMap<UpdateDepartmentDto, Department>();
 
             CreateMap<EmploymentContractDto, EmploymentContract>().ReverseMap();
+            CreateMap<EmploymentContractListDto, EmploymentContract>().ReverseMap().ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.Employee.FullName))
+    .ForMember(dest => dest.EmployeeCode, opt => opt.MapFrom(src => src.Employee.EmployeeCode)); ;
             CreateMap<EmploymentContract,CreateEmploymentContractDto>().ReverseMap();
 
         }

@@ -4,6 +4,8 @@ using Chronos.Application.DTOs.Employee;
 using Chronos.Application.Interfaces;
 using Chronos.Application.Interfaces.IServices;
 using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
+using Chronos.API.Attributes;
+using Chronos.Domain.Constants;
 
 namespace Chronos.API.Controllers
 {
@@ -13,6 +15,7 @@ namespace Chronos.API.Controllers
     public class EmployeesController(IEmployeeService service) : ControllerBase
     {
         [HttpGet]
+        //[HasPermission(Permissions.Departments.View)]
         public async Task<IActionResult> GetAll()
         {
             var result = await service.GetAllAsync();
@@ -40,11 +43,11 @@ namespace Chronos.API.Controllers
                 }
 
                 // Trả về 201 Created chuẩn RESTful
-                return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result);
+                return CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result);
             }
             catch(Exception ex)
             {
-                return StatusCode(500, "Đã xảy ra lỗi máy chủ.");
+                return StatusCode(500, ex.Message);
             }
         }
         [HttpPut("{id}")]
@@ -52,7 +55,6 @@ namespace Chronos.API.Controllers
         {
             if (id != request.Id) return BadRequest("ID mismatch");
 
-            // 👇 Kết quả nhận được giờ là DTO
             var result = await service.UpdateAsync(request);
 
             if (!result.Success) return BadRequest(result);

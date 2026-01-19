@@ -1,4 +1,5 @@
-﻿using Chronos.Application.DTOs.EmploymentContract;
+﻿using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
+using Chronos.Application.DTOs.EmploymentContract;
 using Chronos.Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -37,6 +38,35 @@ namespace Chronos.API.Controllers
         {
             var result = await service.GetByIdAsync(id);
             if (!result.Success) return NotFound(result);
+            return Ok(result);
+        }
+
+        // GET: api/EmploymentContracts
+        [HttpGet]
+        public async Task<IActionResult> GetAllContracts()
+        {
+            var result = await service.GetAllContractsAsync();
+            return Ok(result);
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateEmploymentContractDto request)
+        {
+            if (id != request.Id)
+                return BadRequest(ServiceResponse<EmploymentContractDto>.ErrorResponse("Mã ID không khớp."));
+
+            var result = await service.UpdateAsync(request);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var result = await service.DeleteAsync(id);
+            if (!result.Success) return BadRequest(result);
             return Ok(result);
         }
     }

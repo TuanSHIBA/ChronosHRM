@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using System.Text;
 using System.Text.Json; // 👈 Nhớ using cái này
@@ -47,7 +48,52 @@ namespace ChronosHRM.API
 
             builder.Services.AddControllers();
             builder.Services.AddAuthorization();
-            builder.Services.AddOpenApi();
+            builder.Services.AddOpenApi(options =>
+            {
+                options.AddDocumentTransformer((document, context, cancellationToken) =>
+                {
+                    document.Info = new OpenApiInfo
+                    {
+                        Title = "Chronos HRM API",
+                        Version = "v1",
+                        Description = "API hệ thống quản lý nhân sự"
+                    };
+
+                    document.Components ??= new OpenApiComponents();
+                    document.Components.SecuritySchemes = new Dictionary<string, OpenApiSecurityScheme>
+                    {
+                        ["Bearer"] = new OpenApiSecurityScheme
+                        {
+                            Type = SecuritySchemeType.Http,
+                            Scheme = "bearer",
+                            BearerFormat = "JWT",
+                            In = ParameterLocation.Header,
+                            Description = "Nhập JWT Token vào đây (Không cần chữ Bearer)"
+                        }
+                    };
+
+                    // 2. Yêu cầu bảo mật toàn cục (Áp dụng cho tất cả API)
+                    document.SecurityRequirements = new List<OpenApiSecurityRequirement>
+        {
+            new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            }
+        };
+
+                    return Task.CompletedTask;
+                });
+            });
 
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddValidatorsFromAssembly(typeof(IEmployeeService).Assembly);

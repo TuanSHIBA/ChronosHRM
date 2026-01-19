@@ -11,7 +11,7 @@ namespace Chronos.Application.Interfaces.IServices
     public interface IAuthService
     {
      
-        Task<ServiceResponse<TokenDto>> LoginAsync(LoginDto request);
+        Task<ServiceResponse<LoginResponseDto>> LoginAsync(LoginDto request);
         Task<ServiceResponse<string>> RegisterAsync(RegisterDto request);
         Task<ServiceResponse<TokenDto>> RefreshTokenAsync(TokenDto request);
     }

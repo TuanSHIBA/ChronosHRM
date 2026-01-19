@@ -26,9 +26,33 @@ namespace Chronos.Persistence.Repositories
             return await _dbSet.FindAsync(id);
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync(
+           Expression<Func<T, bool>>? filter = null,
+           Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+           string includeProperties = "")
         {
-            return await _dbSet.ToListAsync();
+            IQueryable<T> query = _dbSet;
+
+            // 1. Xử lý Filter (ví dụ: lấy theo EmployeeId)
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            // 2. Xử lý Include (Vòng lặp thần thánh)
+            // Nếu bạn truyền chuỗi "Employee", nó sẽ chạy query.Include("Employee")
+            foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+            // 3. Xử lý OrderBy
+            if (orderBy != null)
+            {
+                return await orderBy(query).ToListAsync();
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
@@ -50,5 +74,6 @@ namespace Chronos.Persistence.Repositories
         {
             _dbSet.Remove(entity);
         }
+
     }
 }

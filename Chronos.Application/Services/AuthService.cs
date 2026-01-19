@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
+using Chronos.Application.Common.Settings;
+using Chronos.Application.DTOs.Auth;
+using Chronos.Application.Interfaces.IServices;
+using Chronos.Domain.Entity.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Chronos.Application.Common.Settings;
-using Chronos.Application.DTOs.Auth;
-using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
-using Chronos.Application.Interfaces.IServices;
-using Chronos.Domain.Entity.Identity;
 
 namespace Chronos.Application.Services
 {
@@ -29,29 +29,47 @@ namespace Chronos.Application.Services
         }
 
         // ==================== 1. LOGIN (Giữ nguyên logic Refresh Token) ====================
-        public async Task<ServiceResponse<TokenDto>> LoginAsync(LoginDto request)
+        public async Task<ServiceResponse<LoginResponseDto>> LoginAsync(LoginDto request)
         {
+            // 1. Kiểm tra User & Password (Giữ nguyên)
             var user = await _userManager.FindByNameAsync(request.Username);
             if (user == null)
-                return ServiceResponse<TokenDto>.ErrorResponse("Tài khoản không tồn tại.");
+                return ServiceResponse<LoginResponseDto>.ErrorResponse("Tài khoản không tồn tại.");
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
             if (!result.Succeeded)
-                return ServiceResponse<TokenDto>.ErrorResponse("Mật khẩu hoặc tài khoản không đúng.");
+                return ServiceResponse<LoginResponseDto>.ErrorResponse("Mật khẩu hoặc tài khoản không đúng.");
 
-            // Sinh Token (Lúc này Token sẽ chỉ chứa thông tin cơ bản, chưa có Role nếu Admin chưa cấp)
-            var accessToken = await GenerateAccessTokenAsync(user);
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var userClaims = await _userManager.GetClaimsAsync(user);
+
+
+            var accessToken = GenerateAccessToken(user, userRoles, userClaims);
             var refreshToken = GenerateRefreshToken();
 
-            // Update Refresh Token
+            // 4. Update Refresh Token vào DB
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtSettings.DurationInMinutes);
             await _userManager.UpdateAsync(user);
 
-            return ServiceResponse<TokenDto>.SuccessResponse(new TokenDto
+            // 5. Tạo UserDto (Dùng lại biến userRoles và userClaims)
+            var userDto = new UserDto
             {
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
+                Id = user.Id.ToString(),
+                FullName = user.FullName,
+                Roles = userRoles.ToList(),
+                Claims = userClaims.ToList()
+            };
+
+            // 6. Trả về kết quả
+            return ServiceResponse<LoginResponseDto>.SuccessResponse(new LoginResponseDto
+            {
+                Token = new TokenDto
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken
+                },
+                User = userDto
             }, "Đăng nhập thành công!");
         }
 
@@ -85,28 +103,22 @@ namespace Chronos.Application.Services
             return ServiceResponse<string>.SuccessResponse(user.Id.ToString(), "Đăng ký thành công!");
         }
 
-        // ==================== HELPER METHODS ====================
-
-        private async Task<string> GenerateAccessTokenAsync(ApplicationUser user)
+        private string GenerateAccessToken(ApplicationUser user, IList<string> roles, IList<Claim> claims)
         {
-            // Lấy Role từ DB (Nếu user mới tạo thì list này sẽ rỗng -> Token sạch)
-            var userRoles = await _userManager.GetRolesAsync(user);
-
-            // Lấy Claims từ DB (Nếu chưa gán thì list rỗng)
-            var userClaims = await _userManager.GetClaimsAsync(user);
-
+            // 1. Tạo các Claim cơ bản
             var authClaims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("fullName", user.FullName)
+                new Claim("fullName", user.FullName ?? "")
             };
 
-            // Tự động nhét Role và Claim vào Token NẾU CÓ
-            authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
-            authClaims.AddRange(userClaims);
+            // 2. Nhét Role và Claim (được truyền từ bên ngoài vào)
+            authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            authClaims.AddRange(claims);
 
+            // 3. Ký Token (Giữ nguyên logic cũ của bạn)
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
 
             var token = new JwtSecurityToken(
@@ -133,34 +145,33 @@ namespace Chronos.Application.Services
             var accessToken = request.AccessToken;
             var refreshToken = request.RefreshToken;
 
-            // 1. Trích xuất thông tin User từ Access Token đã hết hạn
+            // 1. Trích xuất thông tin từ Token hết hạn (Giữ nguyên)
             var principal = GetPrincipalFromExpiredToken(accessToken);
             if (principal == null)
-            {
-                return ServiceResponse<TokenDto>.ErrorResponse("Invalid Access Token (Token không hợp lệ).");
-            }
+                return ServiceResponse<TokenDto>.ErrorResponse("Invalid Access Token.");
 
-            // Lấy UserName từ trong Token cũ
-
-            var userId =  principal.FindFirstValue(ClaimTypes.NameIdentifier);
-
+            var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier); // Hoặc JwtRegisteredClaimNames.Sub
             if (userId == null)
-            {
-                return ServiceResponse<TokenDto>.ErrorResponse("Token không chứa thông tin User ID.");
-            }
+                return ServiceResponse<TokenDto>.ErrorResponse("Token không chứa User ID.");
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
-                return ServiceResponse<TokenDto>.ErrorResponse("Invalid Refresh Token (Token làm mới không hợp lệ hoặc đã hết hạn).");
+                return ServiceResponse<TokenDto>.ErrorResponse("Invalid Refresh Token.");
             }
 
-            // 2. Nếu mọi thứ OK -> Sinh cặp token mới
-            var newAccessToken = await GenerateAccessTokenAsync(user);
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var userClaims = await _userManager.GetClaimsAsync(user);
+
+            // 3. Sinh Access Token mới (Truyền roles và claims vào hàm GenerateAccessToken mới)
+            var newAccessToken = GenerateAccessToken(user, userRoles, userClaims);
+
+            // 4. Sinh Refresh Token mới
             var newRefreshToken = GenerateRefreshToken();
 
-            // 3. Cập nhật xuống DB
+            // 5. Cập nhật xuống DB
             user.RefreshToken = newRefreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtSettings.DurationInMinutes); // Nhớ update cả hạn dùng
             await _userManager.UpdateAsync(user);
 
             return ServiceResponse<TokenDto>.SuccessResponse(new TokenDto
@@ -179,7 +190,7 @@ namespace Chronos.Application.Services
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key)),
-                ValidateLifetime = false 
+                ValidateLifetime = false
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
