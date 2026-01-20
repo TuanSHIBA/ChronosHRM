@@ -1,5 +1,4 @@
 ﻿using Chronos.Domain.Common;
-using Chronos.Domain.Entities;
 using Chronos.Domain.Enums;
 using System;
 using System.Collections.Generic;

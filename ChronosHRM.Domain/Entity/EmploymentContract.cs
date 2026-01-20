@@ -1,8 +1,7 @@
 ﻿using Chronos.Domain.Common;
-using Chronos.Domain.Entity;
 using Chronos.Domain.Enums;
 
-namespace Chronos.Domain.Entities
+namespace Chronos.Domain.Entity
 {
     public class EmploymentContract : BaseEntity
     {

@@ -1,5 +1,4 @@
-﻿using Chronos.Application.Interfaces;
-using Chronos.Domain.Entities;
+﻿using Chronos.Domain.Interfaces;
 using Chronos.Persistence.Context;
 using System;
 using System.Collections;
@@ -18,7 +17,7 @@ namespace Chronos.Persistence.Repositories
         private IEmployeeRepository? _employeeRepository;
         private IDepartmentRepository? _departmentRepository;
         private IEmploymentContractRepository? _contractRepository;
-
+        private IAttendanceRepository? _attendanceRepository;
         public UnitOfWork(ChronosDbContext context)
         {
             _context = context;
@@ -37,6 +36,11 @@ namespace Chronos.Persistence.Repositories
         public IEmploymentContractRepository Contracts
         {
             get { return _contractRepository ??= new EmploymentContractRepository(_context); }
+        }
+
+        public IAttendanceRepository Attendance
+        {
+            get { return _attendanceRepository ??= new AttendanceRepository(_context); }
         }
 
         public async Task<int> SaveChangesAsync()

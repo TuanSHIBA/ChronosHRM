@@ -2,7 +2,7 @@
 using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using Chronos.Application.DTOs.Employee;
 
-namespace Chronos.Application.Interfaces
+namespace Chronos.Application.IServices
 {
     public interface IEmployeeService
     {

@@ -4,6 +4,7 @@ using Chronos.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chronos.Persistence.Migrations
 {
     [DbContext(typeof(ChronosDbContext))]
-    partial class ChronosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260119092631_altertableAttendance")]
+    partial class altertableAttendance
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,9 +27,8 @@ namespace Chronos.Persistence.Migrations
 
             modelBuilder.Entity("Chronos.Domain.Entity.Attendance", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
 
                     b.Property<TimeSpan?>("CheckInTime")
                         .HasColumnType("time");
@@ -34,18 +36,10 @@ namespace Chronos.Persistence.Migrations
                     b.Property<TimeSpan?>("CheckOutTime")
                         .HasColumnType("time");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("EmployeeId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<double>("WorkingHours")
                         .HasColumnType("float");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
+                    b.HasKey("Date");
 
                     b.ToTable("Attendances");
                 });
@@ -442,17 +436,6 @@ namespace Chronos.Persistence.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("Chronos.Domain.Entity.Attendance", b =>
-                {
-                    b.HasOne("Chronos.Domain.Entity.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("Chronos.Domain.Entity.Employee", b =>

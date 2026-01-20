@@ -1,8 +1,5 @@
 ﻿using AutoMapper;
 using Chronos.Application.DTOs.EmploymentContract;
-using Chronos.Application.Interfaces.IServices;
-using Chronos.Application.Interfaces;
-using Chronos.Domain.Entities;
 using Chronos.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -11,6 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using System.Diagnostics.Contracts;
+using Chronos.Domain.Entity;
+using Chronos.Domain.Interfaces;
+using Chronos.Application.IServices;
 
 namespace Chronos.Application.Services
 {

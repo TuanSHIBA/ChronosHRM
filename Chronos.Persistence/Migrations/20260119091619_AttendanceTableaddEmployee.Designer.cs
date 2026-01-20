@@ -4,6 +4,7 @@ using Chronos.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chronos.Persistence.Migrations
 {
     [DbContext(typeof(ChronosDbContext))]
-    partial class ChronosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260119091619_AttendanceTableaddEmployee")]
+    partial class AttendanceTableaddEmployee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,9 +27,11 @@ namespace Chronos.Persistence.Migrations
 
             modelBuilder.Entity("Chronos.Domain.Entity.Attendance", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<TimeSpan?>("CheckInTime")
                         .HasColumnType("time");
@@ -37,7 +42,10 @@ namespace Chronos.Persistence.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("EmployeeId")
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("EmployeeId1")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<double>("WorkingHours")
@@ -45,7 +53,7 @@ namespace Chronos.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId");
+                    b.HasIndex("EmployeeId1");
 
                     b.ToTable("Attendances");
                 });
@@ -448,7 +456,7 @@ namespace Chronos.Persistence.Migrations
                 {
                     b.HasOne("Chronos.Domain.Entity.Employee", "Employee")
                         .WithMany()
-                        .HasForeignKey("EmployeeId")
+                        .HasForeignKey("EmployeeId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

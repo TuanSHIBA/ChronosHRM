@@ -1,12 +1,7 @@
-﻿using Chronos.Application.Interfaces;
-using Chronos.Domain.Entity;
+﻿using Chronos.Domain.Entity;
+using Chronos.Domain.Interfaces;
 using Chronos.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Chronos.Persistence.Repositories
 {

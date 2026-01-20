@@ -7,7 +7,7 @@ namespace Chronos.API.Authorization
 {
     public class PermissionPolicyProvider(IOptions<AuthorizationOptions> options) : DefaultAuthorizationPolicyProvider(options)
     {
-        public override async Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
+        public override async Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
         {
             // Kiểm tra xem policy đã tồn tại chưa (Ví dụ policy mặc định "AdminOnly")
             var policy = await base.GetPolicyAsync(policyName);

@@ -2,11 +2,12 @@
 using Chronos.Application.Common.Models;
 using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using Chronos.Application.DTOs.Employee;
-using Chronos.Application.Interfaces;
-using Chronos.Application.Interfaces.IServices;
-using Chronos.Domain.Entities;
+
+using Chronos.Application.IServices;
+
 using Chronos.Domain.Entity;
 using Chronos.Domain.Enums;
+using Chronos.Domain.Interfaces;
 
 namespace Chronos.Application.Services
 {

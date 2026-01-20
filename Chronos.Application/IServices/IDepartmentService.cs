@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chronos.Application.Interfaces.IServices
+namespace Chronos.Application.IServices
 {
     public interface IDepartmentService
     {

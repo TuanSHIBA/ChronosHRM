@@ -1,11 +1,11 @@
 ﻿using Chronos.API.Authorization;
 using Chronos.Application.Common.Settings;
 using Chronos.Application.DTOs.Employee;
-using Chronos.Application.Interfaces;
-using Chronos.Application.Interfaces.IServices;
+using Chronos.Application.IServices;
 using Chronos.Application.Mappings;
 using Chronos.Application.Services;
 using Chronos.Domain.Entity.Identity;
+using Chronos.Domain.Interfaces;
 using Chronos.Persistence.Context;
 using Chronos.Persistence.Repositories;
 using FluentValidation;
@@ -99,7 +99,7 @@ namespace ChronosHRM.API
             builder.Services.AddValidatorsFromAssembly(typeof(IEmployeeService).Assembly);
 
             var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
-            builder.Services.AddSingleton(jwtSettings); 
+            builder.Services.AddSingleton(jwtSettings!); 
 
             // 2. Cấu hình Identity
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
@@ -128,9 +128,9 @@ namespace ChronosHRM.API
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
 
-                    ValidIssuer = jwtSettings.Issuer,
-                    ValidAudience = jwtSettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
+                    ValidIssuer = jwtSettings?.Issuer,
+                    ValidAudience = jwtSettings?.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings!.Key)),
                     ClockSkew = TimeSpan.Zero
                 };
 

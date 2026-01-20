@@ -4,6 +4,7 @@ using Chronos.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chronos.Persistence.Migrations
 {
     [DbContext(typeof(ChronosDbContext))]
-    partial class ChronosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260119092721_altertableAttendanceaddIdandforeign")]
+    partial class altertableAttendanceaddIdandforeign
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

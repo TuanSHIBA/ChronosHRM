@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Chronos.Domain.Entity;
 using Chronos.Domain.Common;
-using Chronos.Domain.Entities;
 using Chronos.Domain.Entity.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
@@ -24,7 +23,7 @@ namespace Chronos.Persistence.Context
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<EmploymentContract> EmploymentContracts { get; set; }
-
+        public DbSet<Attendance> Attendances { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // 1. Cấu hình mối quan hệ (Fluent API)

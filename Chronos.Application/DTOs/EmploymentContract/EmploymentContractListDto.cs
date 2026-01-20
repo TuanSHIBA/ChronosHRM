@@ -10,11 +10,11 @@ namespace Chronos.Application.DTOs.EmploymentContract
     public class EmploymentContractListDto
     {
         public Guid Id { get; set; }
-        public string ContractCode { get; set; }
+        public string? ContractCode { get; set; }
 
         public Guid EmployeeId { get; set; }
-        public string FullName { get; set; }
-        public string  EmployeeCode { get; set; }
+        public string? FullName { get; set; }
+        public string?  EmployeeCode { get; set; }
 
         public ContractType ContractType { get; set; }
         public ContractStatus Status { get; set; }

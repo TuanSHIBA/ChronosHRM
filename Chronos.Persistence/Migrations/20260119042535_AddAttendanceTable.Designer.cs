@@ -4,6 +4,7 @@ using Chronos.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chronos.Persistence.Migrations
 {
     [DbContext(typeof(ChronosDbContext))]
-    partial class ChronosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260119042535_AddAttendanceTable")]
+    partial class AddAttendanceTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,32 +25,84 @@ namespace Chronos.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Chronos.Domain.Entity.Attendance", b =>
+            modelBuilder.Entity("Chronos.Domain.Entities.EmploymentContract", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<TimeSpan?>("CheckInTime")
-                        .HasColumnType("time");
+                    b.Property<string>("AttachmentUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<TimeSpan?>("CheckOutTime")
-                        .HasColumnType("time");
+                    b.Property<decimal>("BaseSalary")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<string>("ContractCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ContractType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("EmployeeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double>("WorkingHours")
-                        .HasColumnType("float");
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("InsuranceSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("JobTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("MealAllowance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("OtherAllowance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("SalaryType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SignDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TravelAllowance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("WorkingLocation")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("Attendances");
+                    b.ToTable("EmploymentContracts");
                 });
 
             modelBuilder.Entity("Chronos.Domain.Entity.Department", b =>
@@ -151,86 +206,6 @@ namespace Chronos.Persistence.Migrations
                     b.HasIndex("ManagerId");
 
                     b.ToTable("Employees");
-                });
-
-            modelBuilder.Entity("Chronos.Domain.Entity.EmploymentContract", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AttachmentUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("BaseSalary")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("ContractCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ContractType")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("EmployeeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("InsuranceSalary")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("JobTitle")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("MealAllowance")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("OtherAllowance")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("SalaryType")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("SignDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TravelAllowance")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("WorkingLocation")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("EmploymentContracts");
                 });
 
             modelBuilder.Entity("Chronos.Domain.Entity.Identity.ApplicationRole", b =>
@@ -341,6 +316,34 @@ namespace Chronos.Persistence.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Chronos.Entities.Attendance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<TimeSpan?>("CheckInTime")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan?>("CheckOutTime")
+                        .HasColumnType("time");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("WorkingHours")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Attendances");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
@@ -444,10 +447,10 @@ namespace Chronos.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Chronos.Domain.Entity.Attendance", b =>
+            modelBuilder.Entity("Chronos.Domain.Entities.EmploymentContract", b =>
                 {
                     b.HasOne("Chronos.Domain.Entity.Employee", "Employee")
-                        .WithMany()
+                        .WithMany("Contracts")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -471,17 +474,6 @@ namespace Chronos.Persistence.Migrations
                     b.Navigation("Department");
 
                     b.Navigation("Manager");
-                });
-
-            modelBuilder.Entity("Chronos.Domain.Entity.EmploymentContract", b =>
-                {
-                    b.HasOne("Chronos.Domain.Entity.Employee", "Employee")
-                        .WithMany("Contracts")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

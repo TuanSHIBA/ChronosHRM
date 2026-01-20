@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chronos.Application.Interfaces
+namespace Chronos.Domain.Interfaces
 {
     public interface IDepartmentRepository : IGenericRepository<Department>
     {

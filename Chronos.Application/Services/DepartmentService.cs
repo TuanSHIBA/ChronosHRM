@@ -2,12 +2,12 @@
 using Chronos.Application.Common.Models;
 using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using Chronos.Application.DTOs.Department;
-using Chronos.Application.Interfaces;
-using Chronos.Application.Interfaces.IServices;
+using Chronos.Application.IServices;
+
 
 // using Chronos.Application.Interfaces.Repositories; // 👈 Bỏ dòng này
-using Chronos.Domain.Entities;
 using Chronos.Domain.Entity;
+using Chronos.Domain.Interfaces;
 
 namespace Chronos.Application.Services
 {

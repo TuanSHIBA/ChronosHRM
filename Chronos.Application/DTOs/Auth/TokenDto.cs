@@ -14,9 +14,9 @@ namespace Chronos.Application.DTOs.Auth
     }
     public class UserDto
     {
-        public string Id { get; set; }
-        public string FullName { get; set; }
-        public List<string> Roles { get; set; }
-        public List<Claim> Claims { get; set; }
+        public string? Id { get; set; }
+        public string? FullName { get; set; }
+        public List<string>? Roles { get; set; }
+        public List<Claim>? Claims { get; set; }
     }
 }

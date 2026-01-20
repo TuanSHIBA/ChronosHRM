@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Chronos.Application.Common.Models; // ✅ Đã sửa dòng này
 using Chronos.Application.DTOs.Department;
-using Chronos.Application.Interfaces.IServices;
 using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
+using Chronos.Application.IServices;
 
 namespace Chronos.API.Controllers
 {

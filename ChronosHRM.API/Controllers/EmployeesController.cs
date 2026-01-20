@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Chronos.Application.Common.Models;
 using Chronos.Application.DTOs.Employee;
-using Chronos.Application.Interfaces;
-using Chronos.Application.Interfaces.IServices;
 using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using Chronos.API.Attributes;
 using Chronos.Domain.Constants;
+using Chronos.Application.IServices;
 
 namespace Chronos.API.Controllers
 {

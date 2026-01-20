@@ -1,7 +1,5 @@
 ﻿using Chronos.Application.DTOs.Auth;
-using Chronos.Application.Interfaces;
-using Chronos.Application.Interfaces.IServices;
-using Chronos.Application.Services;
+using Chronos.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Chronos.API.Controllers

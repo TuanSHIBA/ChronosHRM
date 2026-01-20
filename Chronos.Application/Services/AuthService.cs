@@ -1,7 +1,7 @@
 ﻿using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using Chronos.Application.Common.Settings;
 using Chronos.Application.DTOs.Auth;
-using Chronos.Application.Interfaces.IServices;
+using Chronos.Application.IServices;
 using Chronos.Domain.Entity.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -77,7 +77,7 @@ namespace Chronos.Application.Services
         public async Task<ServiceResponse<string>> RegisterAsync(RegisterDto request)
         {
             // 1. Check trùng
-            var userExists = await _userManager.FindByEmailAsync(request.Email);
+            var userExists = await _userManager.FindByEmailAsync(request.Email!);
             if (userExists != null)
                 return ServiceResponse<string>.ErrorResponse("Email này đã được sử dụng.");
 
@@ -86,12 +86,12 @@ namespace Chronos.Application.Services
             {
                 UserName = request.Username,
                 Email = request.Email,
-                FullName = request.FullName,
+                FullName = request.FullName!,
                 SecurityStamp = Guid.NewGuid().ToString()
             };
 
             // 3. Lưu xuống DB (Chỉ tạo user, KHÔNG gán quyền)
-            var result = await _userManager.CreateAsync(user, request.Password);
+            var result = await _userManager.CreateAsync(user, request.Password!);
 
             if (!result.Succeeded)
             {

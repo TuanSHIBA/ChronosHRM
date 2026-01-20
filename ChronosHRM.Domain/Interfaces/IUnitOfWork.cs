@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chronos.Application.Interfaces
+namespace Chronos.Domain.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
         IEmployeeRepository Employees { get; }
         IDepartmentRepository Departments { get; }
         IEmploymentContractRepository Contracts { get; }
+        IAttendanceRepository  Attendance { get; }
         Task<int> SaveChangesAsync();
     }
 }

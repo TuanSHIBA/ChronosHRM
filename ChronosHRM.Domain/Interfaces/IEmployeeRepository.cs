@@ -1,12 +1,11 @@
-﻿using Chronos.Application.DTOs.Employee;
-using Chronos.Domain.Entity;
+﻿using Chronos.Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chronos.Application.Interfaces
+namespace Chronos.Domain.Interfaces
 {
     public interface IEmployeeRepository : IGenericRepository<Employee>
     {

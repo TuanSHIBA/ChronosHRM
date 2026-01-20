@@ -1,4 +1,4 @@
-﻿using Chronos.Application.Interfaces;
+﻿using Chronos.Domain.Interfaces;
 using Chronos.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using System;

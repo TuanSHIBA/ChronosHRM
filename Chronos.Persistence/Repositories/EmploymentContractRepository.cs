@@ -1,7 +1,6 @@
-﻿using Chronos.Application.Interfaces;
-using Chronos.Domain.Entities;
-using Chronos.Domain.Entity;
+﻿using Chronos.Domain.Entity;
 using Chronos.Domain.Enums;
+using Chronos.Domain.Interfaces;
 using Chronos.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -35,7 +34,10 @@ namespace Chronos.Persistence.Repositories
 
         public async Task<List<EmploymentContract?>> GetEmploymentContractsByEmployeeIdAsync(Guid employeeId)
         {
-            return await _context.EmploymentContracts.Include(c => c.Employee).Where(c => c.EmployeeId == employeeId).OrderByDescending(c => c.StartDate).ToListAsync();
+            return await _context.EmploymentContracts.Include(c => c.Employee).
+                            Where(c => c.EmployeeId == employeeId).
+                            OrderByDescending(c => c.StartDate).
+                            ToListAsync();
         }
 
     }

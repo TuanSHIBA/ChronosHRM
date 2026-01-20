@@ -1,7 +1,6 @@
 ﻿using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using Chronos.Application.DTOs.EmploymentContract;
-using Chronos.Application.Interfaces.IServices;
-using Microsoft.AspNetCore.Http;
+using Chronos.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Chronos.API.Controllers
