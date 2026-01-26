@@ -14,6 +14,7 @@ namespace Chronos.Domain.Interfaces
         Task<Employee?> GetByCodeAsync(string code);
         Task<List<Employee>> GetEmployeesWithDepartmentAsync();
         Task<string?> GetLastCodeByPrefixAsync(string prefix);
+        Task<Employee?> GetByAppUserIdAsync(Guid appUserId);
     }
 
 }

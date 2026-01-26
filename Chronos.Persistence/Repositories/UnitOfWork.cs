@@ -18,6 +18,7 @@ namespace Chronos.Persistence.Repositories
         private IDepartmentRepository? _departmentRepository;
         private IEmploymentContractRepository? _contractRepository;
         private IAttendanceRepository? _attendanceRepository;
+        private ILeaveTypeRepository? _LeaveType;
         public UnitOfWork(ChronosDbContext context)
         {
             _context = context;
@@ -42,6 +43,11 @@ namespace Chronos.Persistence.Repositories
         {
             get { return _attendanceRepository ??= new AttendanceRepository(_context); }
         }
+        public ILeaveTypeRepository LeaveType
+        {
+            get { return _LeaveType ??= new LeaveTypeRepository(_context); }
+        }
+
 
         public async Task<int> SaveChangesAsync()
         {

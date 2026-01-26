@@ -31,6 +31,6 @@ namespace Chronos.Domain.Entity
         public string? WorkingLocation { get; set; } // Địa điểm
         public string? AttachmentUrl { get; set; }   // Link file scan
         public string? Note { get; set; }            // Ghi chú
-        public Employee Employee { get; set; }
+        public required Employee Employee { get; set; }
     }
 }

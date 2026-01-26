@@ -12,6 +12,7 @@ namespace Chronos.Domain.Interfaces
         IDepartmentRepository Departments { get; }
         IEmploymentContractRepository Contracts { get; }
         IAttendanceRepository  Attendance { get; }
+        ILeaveTypeRepository LeaveType { get; }
         Task<int> SaveChangesAsync();
     }
 }

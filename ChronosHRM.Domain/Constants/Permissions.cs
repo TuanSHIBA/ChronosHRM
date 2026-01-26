@@ -24,5 +24,12 @@
             public const string Edit = "Permissions.EmploymentContracts.Edit";
             public const string Delete = "Permissions.EmploymentContracts.Delete";
         }
+        public static class Attendances
+        {
+            public const string View = "Permissions.Attendances.View";
+            public const string Create = "Permissions.Attendances.Create";
+            public const string Edit = "Permissions.Attendances.Edit";
+            public const string Delete = "Permissions.Attendances.Delete";
+        }
     }
 }

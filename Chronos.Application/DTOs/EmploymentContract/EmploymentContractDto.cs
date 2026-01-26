@@ -13,7 +13,7 @@ namespace Chronos.Application.DTOs.EmploymentContract
         public Guid EmployeeId { get; set; }
 
         // 1. THÔNG TIN CHUNG
-        public string ContractCode { get; set; }
+        public string? ContractCode { get; set; }
         public ContractType ContractType { get; set; }
         public ContractStatus Status { get; set; }
         public DateTime SignDate { get; set; } // [MỚI]

@@ -42,6 +42,7 @@ namespace ChronosHRM.API
             builder.Services.AddScoped<IDepartmentService, DepartmentService>();
             builder.Services.AddScoped<IEmploymentContractService, EmploymentContractService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IAttendanceService, AttendanceService>();
             // tài liệu ASP.NET Core Custom Authorization Policy Providers
             builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
             builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();

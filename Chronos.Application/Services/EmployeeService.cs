@@ -24,13 +24,17 @@ namespace Chronos.Application.Services
 
         public async Task<ServiceResponse<List<EmployeeDto>>> GetAllAsync()
         {
-            // Gọi hàm có Include
-            var employees = await _unitOfWork.Employees.GetEmployeesWithDepartmentAsync();
+            var employees = await _unitOfWork.Employees.GetAllAsync(includeProperties:"Department");
             var result = _mapper.Map<List<EmployeeDto>>(employees);
 
             return ServiceResponse<List<EmployeeDto>>.SuccessResponse(result);
         }
-
+        public async Task<EmployeeDto> GetByAppUserIdAsync( Guid IdUser)
+        {
+            var employees = await _unitOfWork.Employees.GetByAppUserIdAsync(IdUser);
+            var result = _mapper.Map<EmployeeDto>(employees);
+            return result;
+        }
         public async Task<ServiceResponse<EmployeeDto>> GetByIdAsync(Guid id)
         {
             var employee = await _unitOfWork.Employees.GetByIdAsync(id);

@@ -36,5 +36,11 @@ namespace Chronos.Persistence.Repositories
                 .Select(e => e.EmployeeCode)                   
                 .FirstOrDefaultAsync();                     
         }
+        public async Task<Employee?> GetByAppUserIdAsync(Guid appUserId)
+        {
+            return await _context.Employees
+                .Include(e => e.Department) 
+                .FirstOrDefaultAsync(e => e.AppUserId == appUserId);
+        }
     }
 }

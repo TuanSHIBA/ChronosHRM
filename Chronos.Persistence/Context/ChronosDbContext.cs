@@ -24,6 +24,8 @@ namespace Chronos.Persistence.Context
         public DbSet<Department> Departments { get; set; }
         public DbSet<EmploymentContract> EmploymentContracts { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
+        public DbSet<LeaveType> LeaveTypes { get; set; }
+        public DbSet<LeaveRequest> LeaveRequests { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // 1. Cấu hình mối quan hệ (Fluent API)

@@ -1,4 +1,5 @@
-﻿using Chronos.Application.DTOs.Attendance;
+﻿using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
+using Chronos.Application.DTOs.Attendance;
 using Chronos.Domain.Entity;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,10 @@ namespace Chronos.Application.IServices
     public interface IAttendanceService
     {
         Task<AttendanceDto?> GetTodayAttendance(Guid employeeId);
-        Task<string> CheckIn(Guid employeeId);
-        Task<string> CheckOut(Guid employeeId);
+        Task<ServiceResponse<AttendanceDto>> CheckIn(Guid employeeId);
+        Task<ServiceResponse<AttendanceDto>> CheckOut(Guid employeeId);
+        Task<ServiceResponse<List<AttendanceRequestDto>>> GetPendingRequests();
+        Task<string> ApproveRequest(Guid managerUserId, ApproveAttendanceDto request);
+        Task<ServiceResponse<List<AttendanceDto>>> GetMyHistory(Guid employeeId, int month, int year);
     }
 }
