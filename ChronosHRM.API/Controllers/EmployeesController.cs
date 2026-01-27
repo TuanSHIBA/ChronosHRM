@@ -1,28 +1,31 @@
-﻿using Chronos.Application.DTOs.Employee;
-using Chronos.Application.Interfaces; // Sửa namespace này cho đúng với Interface của bạn
-using Chronos.Application.Interfaces.IServices;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Chronos.Application.Common.Models;
+using Chronos.Application.DTOs.Employee;
+using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
+using Chronos.API.Attributes;
+using Chronos.Domain.Constants;
+using Chronos.Application.IServices;
 
-namespace ChronosHRM.API.Controllers
+namespace Chronos.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
 
     public class EmployeesController(IEmployeeService service) : ControllerBase
     {
-     
-
         [HttpGet]
+        //[HasPermission(Permissions.Departments.View)]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await service.GetAllAsync()); 
+            var result = await service.GetAllAsync();
+            return Ok(result); 
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var result = await service.GetByIdAsync(id); 
-            if (result == null) return NotFound();
+            var result = await service.GetByIdAsync(id);
+            if (!result.Success) return NotFound(result);
             return Ok(result);
         }
 
@@ -31,13 +34,44 @@ namespace ChronosHRM.API.Controllers
         {
             try
             {
-                var id = await service.CreateAsync(request); 
-                return CreatedAtAction(nameof(GetById), new { id = id }, new { id = id });
+                var result = await service.CreateAsync(request);
+
+                if (!result.Success)
+                {
+                    return BadRequest(result);
+                }
+
+                // Trả về 201 Created chuẩn RESTful
+                return CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return StatusCode(500, ex.Message);
             }
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateEmployeeDto request)
+        {
+            if (id != request.Id) return BadRequest("ID mismatch");
+
+            var result = await service.UpdateAsync(request);
+
+            if (!result.Success) return BadRequest(result);
+
+            return Ok(result); 
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var result = await service.DeleteAsync(id);
+
+            if (!result.Success)
+            {
+                return NotFound(result);
+            }
+
+            return Ok(result);
         }
     }
 }

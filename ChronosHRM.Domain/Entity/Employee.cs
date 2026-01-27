@@ -1,5 +1,4 @@
 ﻿using Chronos.Domain.Common;
-using Chronos.Domain.Entities;
 using Chronos.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -35,5 +34,6 @@ namespace Chronos.Domain.Entity
 
         // Quan hệ 1-N: Một nhân viên có nhiều hợp đồng (Lịch sử lương)
         public ICollection<EmploymentContract> Contracts { get; set; } = new List<EmploymentContract>();
+        public Guid? AppUserId { get; set; }
     }
 }

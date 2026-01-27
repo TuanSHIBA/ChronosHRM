@@ -1,11 +1,7 @@
-﻿using Chronos.Application.Interfaces;
-using Chronos.Domain.Entity;
+﻿using Chronos.Domain.Entity;
+using Chronos.Domain.Interfaces;
 using Chronos.Persistence.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Chronos.Persistence.Repositories
 {
@@ -13,6 +9,12 @@ namespace Chronos.Persistence.Repositories
     {
         public DepartmentRepository(ChronosDbContext context) : base(context)
         {
+        }
+        public async Task<Department?> GetByCodeAsync(string code)
+        {
+
+            return await _context.Departments
+                .FirstOrDefaultAsync(d => d.Code == code);
         }
     }
 }

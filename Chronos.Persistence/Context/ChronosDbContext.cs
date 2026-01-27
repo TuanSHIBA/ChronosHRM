@@ -8,11 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Chronos.Domain.Entity;
 using Chronos.Domain.Common;
-using Chronos.Domain.Entities;
+using Chronos.Domain.Entity.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Chronos.Persistence.Context
 {
-    public class ChronosDbContext : DbContext
+    public class ChronosDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
     {
         public ChronosDbContext(DbContextOptions<ChronosDbContext> options) : base(options)
         {
@@ -22,7 +23,9 @@ namespace Chronos.Persistence.Context
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<EmploymentContract> EmploymentContracts { get; set; }
-
+        public DbSet<Attendance> Attendances { get; set; }
+        public DbSet<LeaveType> LeaveTypes { get; set; }
+        public DbSet<LeaveRequest> LeaveRequests { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // 1. Cấu hình mối quan hệ (Fluent API)
