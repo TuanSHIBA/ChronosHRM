@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Chronos.Application.IServices
 {
-    internal interface ILeaveTypeService
+    public interface ILeaveTypeService
     {
         Task<ServiceResponse<List<LeaveTypeDto>>> GetAll();
         Task<ServiceResponse<LeaveTypeDto>> GetById(Guid id);

@@ -3,6 +3,7 @@ using Chronos.Application.Common.Settings;
 using Chronos.Application.DTOs.Auth;
 using Chronos.Application.IServices;
 using Chronos.Domain.Entity.Identity;
+using Chronos.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,21 +13,11 @@ using System.Text;
 
 namespace Chronos.Application.Services
 {
-    public class AuthService : IAuthService
+    public class AuthService(UserManager<ApplicationUser> _userManager,
+            SignInManager<ApplicationUser> _signInManager,
+            JwtSettings _jwtSettings, IUnitOfWork _unitOfWork) : IAuthService
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly JwtSettings _jwtSettings;
-
-        public AuthService(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            JwtSettings jwtSettings)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _jwtSettings = jwtSettings;
-        }
+   
 
         // ==================== 1. LOGIN (Giữ nguyên logic Refresh Token) ====================
         public async Task<ServiceResponse<LoginResponseDto>> LoginAsync(LoginDto request)
@@ -44,7 +35,7 @@ namespace Chronos.Application.Services
             var userClaims = await _userManager.GetClaimsAsync(user);
 
 
-            var accessToken = GenerateAccessToken(user, userRoles, userClaims);
+            var accessToken = GenerateAccessTokenAsync(user, userRoles, userClaims);
             var refreshToken = GenerateRefreshToken();
 
             // 4. Update Refresh Token vào DB
@@ -103,7 +94,7 @@ namespace Chronos.Application.Services
             return ServiceResponse<string>.SuccessResponse(user.Id.ToString(), "Đăng ký thành công!");
         }
 
-        private string GenerateAccessToken(ApplicationUser user, IList<string> roles, IList<Claim> claims)
+        private async Task<string> GenerateAccessTokenAsync(ApplicationUser user, IList<string> roles, IList<Claim> claims)
         {
             // 1. Tạo các Claim cơ bản
             var authClaims = new List<Claim>
@@ -113,11 +104,13 @@ namespace Chronos.Application.Services
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim("fullName", user.FullName ?? "")
             };
-
-            // 2. Nhét Role và Claim (được truyền từ bên ngoài vào)
+            var employee = (await _unitOfWork.Employees.GetByAppUserIdAsync(user.Id));
             authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
             authClaims.AddRange(claims);
-
+            if (employee != null)
+            {
+                claims.Add(new Claim("EmployeeId", employee.Id.ToString()));
+            }
             // 3. Ký Token (Giữ nguyên logic cũ của bạn)
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
 
@@ -164,7 +157,7 @@ namespace Chronos.Application.Services
             var userClaims = await _userManager.GetClaimsAsync(user);
 
             // 3. Sinh Access Token mới (Truyền roles và claims vào hàm GenerateAccessToken mới)
-            var newAccessToken = GenerateAccessToken(user, userRoles, userClaims);
+            var newAccessToken = GenerateAccessTokenAsync(user, userRoles, userClaims);
 
             // 4. Sinh Refresh Token mới
             var newRefreshToken = GenerateRefreshToken();

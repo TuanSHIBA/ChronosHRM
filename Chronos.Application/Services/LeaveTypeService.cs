@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
+using Chronos.Application.DTOs.Leave;
+using Chronos.Application.IServices;
+using Chronos.Domain.Entity;
+using Chronos.Domain.Interfaces;
 
 namespace Chronos.Application.Services
 {
-    using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
-    using Chronos.Application.DTOs.Leave;
-    using Chronos.Application.IServices;
-    using Chronos.Domain.Entities;
-    using Chronos.Domain.Entity;
-    using Chronos.Domain.Interfaces;
 
     public class LeaveTypeService : ILeaveTypeService
     {
         private readonly IUnitOfWork _unitOfWork;
-        // Inject thêm AutoMapper nếu bạn dùng, ở đây mình map tay cho nhanh nhé
 
         public LeaveTypeService(IUnitOfWork unitOfWork)
         {
@@ -29,7 +22,7 @@ namespace Chronos.Application.Services
             var dtos = list.Select(x => new LeaveTypeDto
             {
                 Id = x.Id,
-                Name = x.Name,
+                Name = x.Name!,
                 Description = x.Description,
                 DefaultDays = x.DefaultDays,
                 IsPaid = x.IsPaid
@@ -45,7 +38,7 @@ namespace Chronos.Application.Services
             return ServiceResponse<LeaveTypeDto>.SuccessResponse(new LeaveTypeDto
             {
                 Id = item.Id,
-                Name = item.Name,
+                Name = item.Name!,
                 Description = item.Description,
                 DefaultDays = item.DefaultDays,
                 IsPaid = item.IsPaid
@@ -57,7 +50,7 @@ namespace Chronos.Application.Services
             var entity = new LeaveType
             {
                 Id = Guid.NewGuid(),
-                Name = request.Name,
+                Name = request.Name!,
                 Description = request.Description,
                 DefaultDays = request.DefaultDays,
                 IsPaid = request.IsPaid,
@@ -73,7 +66,7 @@ namespace Chronos.Application.Services
             var item = await _unitOfWork.LeaveType.GetByIdAsync(id);
             if (item == null) return ServiceResponse<bool>.ErrorResponse("Không tìm thấy");
 
-            item.Name = request.Name;
+            item.Name = request.Name!;
             item.Description = request.Description;
             item.DefaultDays = request.DefaultDays;
             item.IsPaid = request.IsPaid;
