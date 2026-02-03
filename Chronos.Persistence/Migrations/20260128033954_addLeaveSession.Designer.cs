@@ -4,6 +4,7 @@ using Chronos.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chronos.Persistence.Migrations
 {
     [DbContext(typeof(ChronosDbContext))]
-    partial class ChronosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260128033954_addLeaveSession")]
+    partial class addLeaveSession
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,43 +24,6 @@ namespace Chronos.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Chronos.Domain.Entity.AppMenu", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Icon")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("OrderIndex")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ParentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Path")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("RequiredPermission")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ParentId");
-
-                    b.ToTable("AppMenus");
-                });
 
             modelBuilder.Entity("Chronos.Domain.Entity.Attendance", b =>
                 {
@@ -147,8 +113,7 @@ namespace Chronos.Persistence.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("AppUserId")
                         .HasColumnType("uniqueidentifier");
@@ -156,27 +121,11 @@ namespace Chronos.Persistence.Migrations
                     b.Property<string>("AvatarUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("BankAccountNumber")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("BankBranch")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("BankName")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CurrentAddress")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
@@ -186,46 +135,18 @@ namespace Chronos.Persistence.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmployeeCode")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Ethnicity")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("Gender")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Hometown")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("IdentityCardDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("IdentityCardNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("IdentityCardPlace")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<DateTime>("JoinDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("LastModifiedAt")
                         .HasColumnType("datetime2");
@@ -235,53 +156,23 @@ namespace Chronos.Persistence.Migrations
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("ManagerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("MaritalStatus")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Nationality")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("PlaceOfBirth")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<Guid?>("PositionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Religion")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("SocialInsuranceNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
-
-                    b.Property<string>("TaxCode")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
 
                     b.HasIndex("ManagerId");
-
-                    b.HasIndex("PositionId");
 
                     b.ToTable("Employees");
                 });
@@ -573,52 +464,6 @@ namespace Chronos.Persistence.Migrations
                     b.ToTable("LeaveTypes");
                 });
 
-            modelBuilder.Entity("Chronos.Domain.Entity.Position", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal?>("BaseSalaryRangeMax")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("BaseSalaryRangeMin")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Positions");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
@@ -722,15 +567,6 @@ namespace Chronos.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Chronos.Domain.Entity.AppMenu", b =>
-                {
-                    b.HasOne("Chronos.Domain.Entity.AppMenu", "Parent")
-                        .WithMany("Children")
-                        .HasForeignKey("ParentId");
-
-                    b.Navigation("Parent");
-                });
-
             modelBuilder.Entity("Chronos.Domain.Entity.Attendance", b =>
                 {
                     b.HasOne("Chronos.Domain.Entity.Employee", "Employee")
@@ -755,15 +591,9 @@ namespace Chronos.Persistence.Migrations
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Chronos.Domain.Entity.Position", "Position")
-                        .WithMany("Employees")
-                        .HasForeignKey("PositionId");
-
                     b.Navigation("Department");
 
                     b.Navigation("Manager");
-
-                    b.Navigation("Position");
                 });
 
             modelBuilder.Entity("Chronos.Domain.Entity.EmploymentContract", b =>
@@ -847,11 +677,6 @@ namespace Chronos.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Chronos.Domain.Entity.AppMenu", b =>
-                {
-                    b.Navigation("Children");
-                });
-
             modelBuilder.Entity("Chronos.Domain.Entity.Department", b =>
                 {
                     b.Navigation("Employees");
@@ -860,11 +685,6 @@ namespace Chronos.Persistence.Migrations
             modelBuilder.Entity("Chronos.Domain.Entity.Employee", b =>
                 {
                     b.Navigation("Contracts");
-                });
-
-            modelBuilder.Entity("Chronos.Domain.Entity.Position", b =>
-                {
-                    b.Navigation("Employees");
                 });
 #pragma warning restore 612, 618
         }

@@ -14,7 +14,7 @@ namespace Chronos.API.Controllers
     public class EmployeesController(IEmployeeService service) : ControllerBase
     {
         [HttpGet]
-        //[HasPermission(Permissions.Departments.View)]
+        [HasPermission(Permissions.Departments.View)]
         public async Task<IActionResult> GetAll()
         {
             var result = await service.GetAllAsync();

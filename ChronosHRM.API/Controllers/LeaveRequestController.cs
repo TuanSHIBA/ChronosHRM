@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+﻿using Chronos.API.Extensions;
 using Chronos.Application.DTOs.Leave;
 using Chronos.Application.IServices;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -19,7 +20,7 @@ public class LeaveRequestController : ControllerBase
     [HttpPost("create")]
     public async Task<IActionResult> Create(CreateLeaveRequestDto request)
     {
-        var employeeId = await GetCurrentEmployeeIdAsync();
+        var employeeId = User.GetEmployeeId();
         var result = await _service.CreateRequest(employeeId, request);
         if (!result.Success) return BadRequest(result);
         return Ok(result);
@@ -29,7 +30,7 @@ public class LeaveRequestController : ControllerBase
     [HttpGet("my-history")]
     public async Task<IActionResult> GetMyHistory()
     {
-        var employeeId = await GetCurrentEmployeeIdAsync();
+        var employeeId = User.GetEmployeeId();
         return Ok(await _service.GetMyRequests(employeeId));
     }
 
@@ -46,7 +47,7 @@ public class LeaveRequestController : ControllerBase
     // [Authorize(Policy = "Permissions.Leave.Approve")]
     public async Task<IActionResult> Approve(ApproveLeaveRequestDto request)
     {
-        var managerId = await GetCurrentEmployeeIdAsync();
+        var managerId = User.GetEmployeeId();
         return Ok(await _service.ApproveRequest(managerId, request));
     }
 }

@@ -1,4 +1,5 @@
-﻿using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
+﻿using AutoMapper;
+using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using Chronos.Application.DTOs.Leave;
 using Chronos.Application.IServices;
 using Chronos.Domain.Entity;
@@ -7,18 +8,12 @@ using Chronos.Domain.Interfaces;
 namespace Chronos.Application.Services
 {
 
-    public class LeaveTypeService : ILeaveTypeService
+    public class LeaveTypeService(IUnitOfWork unitOfWork) : ILeaveTypeService
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public LeaveTypeService(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
-
+  
         public async Task<ServiceResponse<List<LeaveTypeDto>>> GetAll()
         {
-            var list = await _unitOfWork.LeaveType.GetAllAsync();
+            var list = await unitOfWork.LeaveType.GetAllAsync();
             var dtos = list.Select(x => new LeaveTypeDto
             {
                 Id = x.Id,
@@ -32,7 +27,7 @@ namespace Chronos.Application.Services
 
         public async Task<ServiceResponse<LeaveTypeDto>> GetById(Guid id)
         {
-            var item = await _unitOfWork.LeaveType.GetByIdAsync(id);
+            var item = await unitOfWork.LeaveType.GetByIdAsync(id);
             if (item == null) return ServiceResponse<LeaveTypeDto>.ErrorResponse("Không tìm thấy");
 
             return ServiceResponse<LeaveTypeDto>.SuccessResponse(new LeaveTypeDto
@@ -56,14 +51,14 @@ namespace Chronos.Application.Services
                 IsPaid = request.IsPaid,
             };
 
-            await _unitOfWork.LeaveType.AddAsync(entity);
-            await _unitOfWork.SaveChangesAsync();
+            await unitOfWork.LeaveType.AddAsync(entity);
+            await unitOfWork.SaveChangesAsync();
             return ServiceResponse<Guid>.SuccessResponse(entity.Id);
         }
 
         public async Task<ServiceResponse<bool>> Update(Guid id, CreateLeaveTypeDto request)
         {
-            var item = await _unitOfWork.LeaveType.GetByIdAsync(id);
+            var item = await unitOfWork.LeaveType.GetByIdAsync(id);
             if (item == null) return ServiceResponse<bool>.ErrorResponse("Không tìm thấy");
 
             item.Name = request.Name!;
@@ -72,18 +67,18 @@ namespace Chronos.Application.Services
             item.IsPaid = request.IsPaid;
             item.LastModifiedAt = DateTime.Now;
 
-            _unitOfWork.LeaveType.Update(item);
-            await _unitOfWork.SaveChangesAsync();
+            unitOfWork.LeaveType.Update(item);
+            await unitOfWork.SaveChangesAsync();
             return ServiceResponse<bool>.SuccessResponse(true);
         }
 
         public async Task<ServiceResponse<bool>> Delete(Guid id)
         {
-            var item = await _unitOfWork.LeaveType.GetByIdAsync(id);
+            var item = await unitOfWork.LeaveType.GetByIdAsync(id);
             if (item == null) return ServiceResponse<bool>.ErrorResponse("Không tìm thấy");
 
-            _unitOfWork.LeaveType.Delete(item);
-            await _unitOfWork.SaveChangesAsync();
+            unitOfWork.LeaveType.Delete(item);
+            await unitOfWork.SaveChangesAsync();
             return ServiceResponse<bool>.SuccessResponse(true);
         }
     }

@@ -10,10 +10,11 @@ namespace Chronos.Domain.Interfaces
     {
         IEmployeeRepository Employees { get; }
         IDepartmentRepository Departments { get; }
-        IEmploymentContractRepository Contracts { get; }
+        IEmploymentContractRepository EmploymentContracts { get; }
         IAttendanceRepository  Attendance { get; }
         ILeaveTypeRepository LeaveType { get; }
         ILeaveRequestRepository LeaveRequest { get; }
+        IMenuRepository Menus { get; }
         Task<int> SaveChangesAsync();
     }
 }

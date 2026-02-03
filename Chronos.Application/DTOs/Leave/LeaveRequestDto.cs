@@ -9,16 +9,16 @@ namespace Chronos.Application.DTOs.Leave
     public class LeaveRequestDto
     {
         public Guid Id { get; set; }
-        public string EmployeeName { get; set; } // Tên người xin
-        public string EmployeeCode { get; set; }
-        public string LeaveTypeName { get; set; } // Tên loại nghỉ
+        public required string EmployeeName { get; set; } // Tên người xin
+        public required string EmployeeCode { get; set; }
+        public required string LeaveTypeName { get; set; } // Tên loại nghỉ
 
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
         public double TotalDays { get; set; }
 
-        public string Reason { get; set; }
-        public string Status { get; set; } // Pending, Approved...
+        public required string Reason { get; set; }
+        public required string Status { get; set; } // Pending, Approved...
 
         public string? ManagerNote { get; set; } // Lời nhắn của sếp
         public DateTime CreatedDate { get; set; }

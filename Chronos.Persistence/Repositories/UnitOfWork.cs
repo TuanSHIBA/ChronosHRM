@@ -17,10 +17,11 @@ namespace Chronos.Persistence.Repositories
         // Khai báo biến cache cho các Repository cụ thể
         private IEmployeeRepository? _employee;
         private IDepartmentRepository? _department;
-        private IEmploymentContractRepository? _contract;
+        private IEmploymentContractRepository? _employmentContracts;
         private IAttendanceRepository? _attendance;
         private ILeaveTypeRepository? _leaveType;
         private ILeaveRequestRepository? _leaveRequest;
+        private IMenuRepository? _menus;
         public UnitOfWork(ChronosDbContext context)
         {
             _context = context;
@@ -36,9 +37,9 @@ namespace Chronos.Persistence.Repositories
             get { return _department ??= new DepartmentRepository(_context); }
         }
 
-        public IEmploymentContractRepository Contracts
+        public IEmploymentContractRepository EmploymentContracts
         {
-            get { return _contract ??= new EmploymentContractRepository(_context); }
+            get { return _employmentContracts ??= new EmploymentContractRepository(_context); }
         }
 
         public IAttendanceRepository Attendance
@@ -53,7 +54,10 @@ namespace Chronos.Persistence.Repositories
         {
             get { return _leaveRequest ??= new LeaveRequestRepository(_context); }
         }
-
+        public IMenuRepository Menus
+        {
+            get { return _menus ??= new MenuRepository(_context); }
+        }
         public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();

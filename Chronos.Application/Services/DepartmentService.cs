@@ -67,7 +67,7 @@ namespace Chronos.Application.Services
             if (department == null)
                 return ServiceResponse<DepartmentDto>.ErrorResponse("Phòng ban không tồn tại.");
 
-            department.Name = request.Name;
+            department.Name = request.Name!;
 
             _unitOfWork.Departments.Update(department);
 

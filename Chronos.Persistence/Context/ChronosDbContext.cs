@@ -26,6 +26,9 @@ namespace Chronos.Persistence.Context
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<LeaveType> LeaveTypes { get; set; }
         public DbSet<LeaveRequest> LeaveRequests { get; set; }
+        public DbSet<Position> Positions { get; set; }
+        public DbSet<AppMenu> AppMenus { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // 1. Cấu hình mối quan hệ (Fluent API)

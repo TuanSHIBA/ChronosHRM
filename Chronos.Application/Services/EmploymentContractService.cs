@@ -38,7 +38,7 @@ namespace Chronos.Application.Services
             // Chỉ kiểm tra trùng nếu người dùng đang cố tạo một hợp đồng "Active"
             if (newStatus == ContractStatus.Active)
             {
-                var activeContract = await unitOfWork.Contracts.GetActiveContractByEmployeeIdAsync(request.EmployeeId);
+                var activeContract = await unitOfWork.EmploymentContracts.GetActiveContractByEmployeeIdAsync(request.EmployeeId);
                 if (activeContract != null)
                 {
                     return ServiceResponse<EmploymentContractDto>.ErrorResponse(
@@ -57,7 +57,7 @@ namespace Chronos.Application.Services
 
             // 6. Tự động sinh Mã Hợp Đồng (Format: HD-MNV-01)
             // Lưu ý: Đếm tất cả hợp đồng kể cả đã xóa hoặc hủy để tránh trùng mã lịch sử
-            int count = await unitOfWork.Contracts.CountContractsByEmployeeIdAsync(request.EmployeeId);
+            int count = await unitOfWork.EmploymentContracts.CountContractsByEmployeeIdAsync(request.EmployeeId);
             contract.ContractCode = $"HD-{employee.EmployeeCode}-{count + 1:D2}";
 
             // 7. Xử lý logic Lương đóng bảo hiểm (Nếu không nhập thì mặc định bằng Lương cứng)
@@ -67,7 +67,7 @@ namespace Chronos.Application.Services
             }
 
             // 8. Lưu vào DB
-            await unitOfWork.Contracts.AddAsync(contract);
+            await unitOfWork.EmploymentContracts.AddAsync(contract);
             await unitOfWork.SaveChangesAsync();
 
             // 9. Trả về kết quả
@@ -76,14 +76,14 @@ namespace Chronos.Application.Services
         }
         public async Task<ServiceResponse<List<EmploymentContractDto>>> GetByEmployeeIdAsync(Guid employeeId)
         {
-            var contracts = await unitOfWork.Contracts.GetEmploymentContractsByEmployeeIdAsync(employeeId);
+            var contracts = await unitOfWork.EmploymentContracts.GetEmploymentContractsByEmployeeIdAsync(employeeId);
             var result = mapper.Map<List<EmploymentContractDto>>(contracts);
             return ServiceResponse<List<EmploymentContractDto>>.SuccessResponse(result);
         }
 
         public async Task<ServiceResponse<EmploymentContractDto>> GetByIdAsync(Guid id)
         {
-            var contract = await unitOfWork.Contracts.GetByIdAsync(id);
+            var contract = await unitOfWork.EmploymentContracts.GetByIdAsync(id);
             if (contract == null)
                 return ServiceResponse<EmploymentContractDto>.ErrorResponse("Hợp đồng không tồn tại");
 
@@ -93,7 +93,7 @@ namespace Chronos.Application.Services
         public async Task<ServiceResponse<List<EmploymentContractListDto>>> GetAllContractsAsync()
         {
             // Lúc này tham số includeProperties mới có tác dụng
-            var contracts = await unitOfWork.Contracts.GetAllAsync(includeProperties: "Employee");
+            var contracts = await unitOfWork.EmploymentContracts.GetAllAsync(includeProperties: "Employee");
             foreach (var item in contracts.ToList())
             {
                 var a = $"{item.Employee.FirstName} {item.Employee.LastName}";
@@ -105,7 +105,7 @@ namespace Chronos.Application.Services
         public async Task<ServiceResponse<EmploymentContractDto>> UpdateAsync(UpdateEmploymentContractDto request)
         {
             // 1. Tìm hợp đồng
-            var contract = await unitOfWork.Contracts.GetByIdAsync(request.Id);
+            var contract = await unitOfWork.EmploymentContracts.GetByIdAsync(request.Id);
             if (contract == null)
                 return ServiceResponse<EmploymentContractDto>.ErrorResponse("Hợp đồng không tồn tại.");
 
@@ -131,7 +131,7 @@ namespace Chronos.Application.Services
             }
 
             // 6. Cập nhật và Lưu
-            unitOfWork.Contracts.Update(contract);
+            unitOfWork.EmploymentContracts.Update(contract);
             await unitOfWork.SaveChangesAsync();
 
             // 7. Map ngược lại DTO để trả về cho Frontend
@@ -142,7 +142,7 @@ namespace Chronos.Application.Services
 
         public async Task<ServiceResponse<bool>> DeleteAsync(Guid id)
         {
-            var contract = await unitOfWork.Contracts.GetByIdAsync(id);
+            var contract = await unitOfWork.EmploymentContracts.GetByIdAsync(id);
             if (contract == null)
                 return ServiceResponse<bool>.ErrorResponse("Hợp đồng không tìm thấy.");
 
@@ -150,7 +150,7 @@ namespace Chronos.Application.Services
             if (contract.Status == ContractStatus.Active)
                 return ServiceResponse<bool>.ErrorResponse("Không thể xóa hợp đồng đang hiệu lực. Vui lòng chuyển trạng thái sang Hủy hoặc Thôi việc.");
 
-            unitOfWork.Contracts.Delete(contract);
+            unitOfWork.EmploymentContracts.Delete(contract);
             await unitOfWork.SaveChangesAsync();
 
             return ServiceResponse<bool>.SuccessResponse(true, "Đã xóa hợp đồng.");

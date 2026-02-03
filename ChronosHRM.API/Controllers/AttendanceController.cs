@@ -1,4 +1,5 @@
 ﻿using Chronos.API.Attributes;
+using Chronos.API.Extensions;
 using Chronos.Application.DTOs.Attendance;
 using Chronos.Application.IServices;
 using Chronos.Domain.Constants;
@@ -11,31 +12,16 @@ namespace Chronos.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize] // 🔒 Bắt buộc phải có Token
-    public class AttendanceController(IAttendanceService _attendanceService, IEmployeeService employeeService) : ControllerBase
+    public class AttendanceController(IAttendanceService _attendanceService) : ControllerBase
     {
 
-        // 👇 Hàm phụ trợ: Lấy EmployeeId từ Token
-        // Giả sử trong Token bạn lưu EmployeeId vào claim "NameIdentifier" hoặc "Id"
-        private async Task<Guid> GetCurrentUserIdAsync()
-        {
-            var idClaim = User.FindFirst(ClaimTypes.NameIdentifier); // Hoặc "sub", "id" tùy cấu hình JWT
-            if (idClaim != null && Guid.TryParse(idClaim.Value, out Guid userId))
-            {
-                // return userId;
-                return (await employeeService.GetByAppUserIdAsync(userId)).Id;
-
-            }
-            throw new UnauthorizedAccessException("Token không hợp lệ hoặc không chứa EmployeeId.");
-        }
-
-        // 1. GET: api/attendance/today
         [HttpGet("today")]
         public async Task<IActionResult> GetToday()
         {
             try
             {
-                var userId = await GetCurrentUserIdAsync();
-                var record = await _attendanceService.GetTodayAttendance(userId);
+                var employeeId = User.GetEmployeeId();
+                var record = await _attendanceService.GetTodayAttendance(employeeId);
 
                 return Ok(new { success = true, data = record });
             }
@@ -51,19 +37,16 @@ namespace Chronos.API.Controllers
         {
             try
             {
-                // Bước 1: Lấy ID nhân viên
-                var employeeId = await GetCurrentUserIdAsync();
+                var employeeId = User.GetEmployeeId();
 
-                // Bước 2: Gọi Service (Service giờ trả về object chứa cả Data lẫn Message)
                 var response = await _attendanceService.CheckIn(employeeId);
 
-                // Bước 3: Kiểm tra kết quả dựa trên biến Success (Chuẩn hơn check string)
                 if (!response.Success)
                 {
-                    return BadRequest(response); // Trả về lỗi kèm message
+                    return BadRequest(response); 
                 }
 
-                return Ok(response); // Trả về data (CheckInTime, Status...) cho FE hiển thị
+                return Ok(response); 
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -81,7 +64,7 @@ namespace Chronos.API.Controllers
         {
             try
             {
-                var employeeId = await GetCurrentUserIdAsync();
+                var employeeId = User.GetEmployeeId();
 
                 var response = await _attendanceService.CheckOut(employeeId);
 
@@ -114,7 +97,7 @@ namespace Chronos.API.Controllers
         public async Task<IActionResult> Approve([FromBody] ApproveAttendanceDto request)
         {
             // Lấy ID của ông Sếp đang đăng nhập
-            var managerId = await GetCurrentUserIdAsync();
+            var managerId = User.GetEmployeeId();
 
             if (managerId != Guid.Empty)
             {
@@ -131,7 +114,7 @@ namespace Chronos.API.Controllers
             try
             {
                 // 1. Lấy ID nhân viên đang đăng nhập
-                var employeeId = await GetCurrentUserIdAsync();
+                var employeeId = User.GetEmployeeId();
 
                 // 2. Nếu không truyền tháng/năm thì lấy thời gian hiện tại
                 if (month == 0) month = DateTime.Now.Month;

@@ -53,7 +53,7 @@ namespace Chronos.Application.Services
                 return ServiceResponse<EmployeeDto>.ErrorResponse("Phòng ban không hợp lệ.");
 
             string newCode = await GenerateEmployeeCodeAsync();
-            string status  = ((EmployeeStatus)request.Status).ToString();
+
             // 3. Map và Lưu
             var employee = _mapper.Map<Employee>(request);
             employee.EmployeeCode = newCode;

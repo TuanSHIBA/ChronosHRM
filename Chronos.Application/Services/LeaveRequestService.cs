@@ -1,7 +1,9 @@
-﻿using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
+﻿using AutoMapper;
+using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using Chronos.Application.DTOs.Leave;
 using Chronos.Application.IServices;
 using Chronos.Domain.Entity;
+using Chronos.Domain.Enums;
 using Chronos.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -11,37 +13,61 @@ using System.Threading.Tasks;
 
 namespace Chronos.Application.Services
 {
-    public class LeaveRequestService : ILeaveRequestService
+    public class LeaveRequestService(IUnitOfWork _unitOfWork, IMapper _mapper) : ILeaveRequestService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        //private readonly IUnitOfWork _unitOfWork;
 
-        public LeaveRequestService(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+        //public LeaveRequestService(IUnitOfWork unitOfWork)
+        //{
+        //    _unitOfWork = unitOfWork;
+        //}
 
         public async Task<ServiceResponse<Guid>> CreateRequest(Guid employeeId, CreateLeaveRequestDto request)
         {
-            // 1. Validate ngày
-            if (request.FromDate > request.ToDate)
-                return ServiceResponse<Guid>.ErrorResponse("Ngày bắt đầu phải trước ngày kết thúc.");
+            // 1. Validate cơ bản
+            if (request.FromDate.Date > request.ToDate.Date)
+                return ServiceResponse<Guid>.ErrorResponse("Ngày kết thúc không được nhỏ hơn ngày bắt đầu.");
 
-            // 2. Tính số ngày (Đơn giản: Trừ nhau + 1)
-            // Nâng cao sau này: Trừ thứ 7, CN, ngày lễ
-            var totalDays = (request.ToDate - request.FromDate).TotalDays + 1;
+            double totalDays = 0;
 
-            var entity = new LeaveRequest
+            // 2. PHÂN LOẠI XỬ LÝ
+
+            // TRƯỜNG HỢP A: Nghỉ nhiều ngày (Khác ngày)
+            if (request.FromDate.Date != request.ToDate.Date)
             {
-                Id = Guid.NewGuid(),
-                EmployeeId = employeeId,
-                LeaveTypeId = request.LeaveTypeId,
-                FromDate = request.FromDate,
-                ToDate = request.ToDate,
-                TotalDays = totalDays,
-                Reason = request.Reason,
-                Status = LeaveStatus.Pending,
-                CreatedAt = DateTime.Now
-            };
+                // Khi nghỉ nhiều ngày, BẮT BUỘC phải tính là Full Day
+                // Không chấp nhận chuyện chọn Session Sáng/Chiều ở đây
+                // (Nếu user muốn nghỉ lẻ tẻ, họ phải tách làm 2 đơn như bạn đã quyết định)
+
+                totalDays = (request.ToDate.Date - request.FromDate.Date).TotalDays + 1;
+            }
+            // TRƯỜNG HỢP B: Nghỉ trong 1 ngày (Cùng ngày)
+            else
+            {
+                if (request.Session == LeaveSession.Morning || request.Session == LeaveSession.Afternoon)
+                {
+                    totalDays = 0.5; // Nửa buổi
+                }
+                else
+                {
+                    totalDays = 1.0; // Cả ngày hôm đó
+                }
+            }
+
+            // 3. Map và Lưu (Đơn giản như đan rổ)
+            var entity = _mapper.Map<LeaveRequest>(request);
+
+            // Gán các giá trị tính toán
+            entity.Id = Guid.NewGuid();
+            entity.EmployeeId = employeeId;
+            entity.TotalDays = totalDays;
+
+            // Lưu session để hiển thị lại cho đúng (VD: Nghỉ Sáng 20/05)
+            // Nếu nghỉ nhiều ngày thì mặc định lưu AllDay
+            entity.Session = (request.FromDate.Date != request.ToDate.Date) ? LeaveSession.AllDay : request.Session;
+
+            entity.Status = LeaveStatus.Pending;
+            entity.CreatedAt = DateTime.Now;
 
             await _unitOfWork.LeaveRequest.AddAsync(entity);
             await _unitOfWork.SaveChangesAsync();

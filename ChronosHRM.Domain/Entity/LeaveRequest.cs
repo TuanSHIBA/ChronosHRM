@@ -1,4 +1,5 @@
 ﻿using Chronos.Domain.Common;
+using Chronos.Domain.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Chronos.Domain.Entity
@@ -21,15 +22,7 @@ namespace Chronos.Domain.Entity
         public LeaveStatus Status { get; set; } = LeaveStatus.Pending;
 
         public Guid? ApprovedById { get; set; }
-        public string? ManagerNote { get; set; } 
-    }
-
-    // Enum trạng thái
-    public enum LeaveStatus
-    {
-        Pending = 0,    // Chờ duyệt
-        Approved = 1,   // Đã duyệt
-        Rejected = 2,   // Từ chối
-        Cancelled = 3   // Hủy (Nhân viên tự hủy đơn)
+        public string? ManagerNote { get; set; }
+        public LeaveSession Session { get; set; }
     }
 }
