@@ -3,6 +3,7 @@ using Chronos.Application.DTOs.Department;
 using Chronos.Application.DTOs.Employee;
 using Chronos.Application.DTOs.EmploymentContract;
 using Chronos.Application.DTOs.Leave;
+using Chronos.Application.DTOs.Position;
 using Chronos.Domain.Entity;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,8 @@ namespace Chronos.Application.Mappings
             .ForMember(dest => dest.EmployeeCode, opt => opt.MapFrom(src => src.Employee.EmployeeCode)); ;
             CreateMap<EmploymentContract, CreateEmploymentContractDto>();
             CreateMap<CreateLeaveRequestDto, LeaveRequest>();
+            CreateMap<LeaveTypeDto, LeaveType>().ReverseMap();
+            CreateMap<PositionDto, Position>().ReverseMap();
 
         }
     }

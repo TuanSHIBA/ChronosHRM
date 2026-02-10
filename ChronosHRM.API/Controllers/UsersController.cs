@@ -10,19 +10,9 @@ namespace Chronos.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")] // Chỉ Admin to nhất mới được vào đây
-    public class UsersController : ControllerBase
+    [Authorize(Roles = "Admin")] 
+    public class UsersController(UserManager<ApplicationUser> _userManager, RoleManager<ApplicationRole> _roleManage) : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<ApplicationRole> _roleManager;
-
-        public UsersController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
-        {
-            _userManager = userManager;
-            _roleManager = roleManager;
-        }
-
-        // 1. Lấy danh sách User kèm Role
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -44,7 +34,6 @@ namespace Chronos.API.Controllers
             return Ok(userDtos);
         }
 
-        // 2. Tạo User mới (Admin tạo cho nhân viên)
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto model)
         {
@@ -55,21 +44,18 @@ namespace Chronos.API.Controllers
             {
                 UserName = model.Username,
                 Email = model.Email,
-                // Link với bảng Employee nếu cần
             };
 
             var result = await _userManager.CreateAsync(newUser, model.Password);
 
             if (!result.Succeeded) return BadRequest(result.Errors);
 
-            // Mặc định gán role Employee
             await _userManager.AddToRoleAsync(newUser, "Employee");
 
             return Ok("Tạo user thành công");
         }
 
-        // 3. Gán Role cho User (Quan trọng nhất!)
-        // PUT: api/users/{id}/roles
+
         [HttpPut("{userId}/roles")]
         public async Task<IActionResult> AssignRoles(Guid userId, [FromBody] List<string> roles)
         {
@@ -104,8 +90,7 @@ namespace Chronos.API.Controllers
             return Ok(userClaims.Select(c => c.Value).ToList());
         }
 
-        // 5. Cập nhật Quyền riêng cho User (Gán quyền ngoại lệ)
-        // PUT: api/users/{userId}/permissions
+
         [HttpPut("{userId}/permissions")]
         public async Task<IActionResult> UpdateUserPermissions(Guid userId, [FromBody] List<string> permissionValues)
         {
@@ -115,11 +100,7 @@ namespace Chronos.API.Controllers
             // 1. Lấy tất cả claim hiện tại của User
             var currentClaims = await _userManager.GetClaimsAsync(user);
 
-            // 2. Xóa sạch các claim cũ (chỉ xóa claim loại "Permission" để tránh xóa nhầm các claim khác như email, avatar...)
-            // Lưu ý: Nếu hệ thống bạn dùng ClaimType là "Permission" cho mọi quyền hạn
             var claimsToRemove = currentClaims.Where(c => c.Type == "Permission").ToList();
-            // Hoặc nếu bạn muốn reset hết thì xóa hết (cẩn thận):
-            // var claimsToRemove = currentClaims; 
 
             if (claimsToRemove.Any())
             {
@@ -127,7 +108,6 @@ namespace Chronos.API.Controllers
                 if (!removeResult.Succeeded) return BadRequest("Lỗi khi xóa quyền cũ");
             }
 
-            // 3. Thêm các claim mới
             var newClaims = permissionValues.Select(value => new System.Security.Claims.Claim("Permission", value)).ToList();
 
             if (newClaims.Any())

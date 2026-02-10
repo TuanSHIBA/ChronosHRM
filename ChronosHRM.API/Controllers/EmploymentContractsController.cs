@@ -7,10 +7,10 @@ namespace Chronos.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmploymentContractsController (IEmploymentContractService service) : ControllerBase
+    public class EmploymentContractsController(IEmploymentContractService service) : ControllerBase
     {
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateEmploymentContractDto request)
+        public async Task<IActionResult> Create(CreateEmploymentContractDto request)
         {
             try
             {
@@ -23,7 +23,6 @@ namespace Chronos.API.Controllers
             }
         }
 
-        // GET: api/EmploymentContracts/employee/{employeeId}
         [HttpGet("employee/{employeeId}")]
         public async Task<IActionResult> GetByEmployee(Guid employeeId)
         {
@@ -31,7 +30,6 @@ namespace Chronos.API.Controllers
             return Ok(result);
         }
 
-        // GET: api/EmploymentContracts/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -40,15 +38,15 @@ namespace Chronos.API.Controllers
             return Ok(result);
         }
 
-        // GET: api/EmploymentContracts
         [HttpGet]
         public async Task<IActionResult> GetAllContracts()
         {
             var result = await service.GetAllContractsAsync();
             return Ok(result);
         }
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateEmploymentContractDto request)
+        public async Task<IActionResult> Update(Guid id, UpdateEmploymentContractDto request)
         {
             if (id != request.Id)
                 return BadRequest(ServiceResponse<EmploymentContractDto>.ErrorResponse("Mã ID không khớp."));

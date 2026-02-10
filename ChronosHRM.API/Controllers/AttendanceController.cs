@@ -5,13 +5,12 @@ using Chronos.Application.IServices;
 using Chronos.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Chronos.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // 🔒 Bắt buộc phải có Token
+    [Authorize] 
     public class AttendanceController(IAttendanceService _attendanceService) : ControllerBase
     {
 
@@ -31,7 +30,6 @@ namespace Chronos.API.Controllers
             }
         }
 
-        // 2. POST: api/attendance/check-in
         [HttpPost("check-in")]
         public async Task<IActionResult> CheckIn()
         {
@@ -43,10 +41,10 @@ namespace Chronos.API.Controllers
 
                 if (!response.Success)
                 {
-                    return BadRequest(response); 
+                    return BadRequest(response);
                 }
 
-                return Ok(response); 
+                return Ok(response);
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -58,7 +56,6 @@ namespace Chronos.API.Controllers
             }
         }
 
-        // 3. API Check-out (Nâng cấp)
         [HttpPost("check-out")]
         public async Task<IActionResult> CheckOut()
         {
@@ -83,7 +80,7 @@ namespace Chronos.API.Controllers
             {
                 return BadRequest(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
             }
-         }
+        }
         [HttpGet("pending-list")]
         [HasPermission(Permissions.Attendances.View)]
         public async Task<IActionResult> GetPendingList()
@@ -94,7 +91,7 @@ namespace Chronos.API.Controllers
 
         [HttpPost("approve")]
         [HasPermission(Permissions.Attendances.Edit)]
-        public async Task<IActionResult> Approve([FromBody] ApproveAttendanceDto request)
+        public async Task<IActionResult> Approve(ApproveAttendanceDto request)
         {
             // Lấy ID của ông Sếp đang đăng nhập
             var managerId = User.GetEmployeeId();
@@ -109,7 +106,7 @@ namespace Chronos.API.Controllers
         }
 
         [HttpGet("my-history")]
-        public async Task<IActionResult> GetMyHistory([FromQuery] int month, [FromQuery] int year)
+        public async Task<IActionResult> GetMyHistory(int month, int year)
         {
             try
             {

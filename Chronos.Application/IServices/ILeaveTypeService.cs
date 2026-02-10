@@ -12,8 +12,8 @@ namespace Chronos.Application.IServices
     {
         Task<ServiceResponse<List<LeaveTypeDto>>> GetAll();
         Task<ServiceResponse<LeaveTypeDto>> GetById(Guid id);
-        Task<ServiceResponse<Guid>> Create(CreateLeaveTypeDto request);
-        Task<ServiceResponse<bool>> Update(Guid id, CreateLeaveTypeDto request);
+        Task<ServiceResponse<LeaveTypeDto>> Create(CreateLeaveTypeDto request);
+        Task<ServiceResponse<LeaveTypeDto>> Update(Guid id, CreateLeaveTypeDto request);
         Task<ServiceResponse<bool>> Delete(Guid id);
     }
 }

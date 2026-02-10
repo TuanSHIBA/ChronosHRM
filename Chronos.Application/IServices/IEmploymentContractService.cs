@@ -15,7 +15,6 @@ namespace Chronos.Application.IServices
         Task<ServiceResponse<EmploymentContractDto>> GetByIdAsync(Guid id);
         Task<ServiceResponse<List<EmploymentContractListDto>>> GetAllContractsAsync();
         Task<ServiceResponse<EmploymentContractDto>> UpdateAsync(UpdateEmploymentContractDto request);
-
         Task<ServiceResponse<bool>> DeleteAsync(Guid id);
     }
 }

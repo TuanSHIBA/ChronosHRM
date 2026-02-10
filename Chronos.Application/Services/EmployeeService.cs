@@ -24,8 +24,52 @@ namespace Chronos.Application.Services
 
         public async Task<ServiceResponse<List<EmployeeDto>>> GetAllAsync()
         {
-            var employees = await _unitOfWork.Employees.GetAllAsync(includeProperties:"Department");
-            var result = _mapper.Map<List<EmployeeDto>>(employees);
+            
+            var employees = await _unitOfWork.Employees.GetAllAsync(includeProperties: "Department,Position");
+
+            var result = employees.Select(e => new EmployeeDto
+            {
+             
+                Id = e.Id,
+                EmployeeCode = e.EmployeeCode,
+                FirstName = e.FirstName,
+                LastName = e.LastName,
+                FullName = $"{e.LastName} {e.FirstName}",
+                AvatarUrl = e.AvatarUrl,
+                Email = e.Email,
+                PhoneNumber = e.PhoneNumber,
+                Address = e.Address,
+                CurrentAddress = e.CurrentAddress,
+
+                DateOfBirth = e.DateOfBirth,
+                Gender = e.Gender,
+                MaritalStatus = e.MaritalStatus,
+                PlaceOfBirth = e.PlaceOfBirth,
+                Hometown = e.Hometown,
+                Ethnicity = e.Ethnicity,
+                Religion = e.Religion,
+                Nationality = e.Nationality,
+
+                IdentityCardNumber = e.IdentityCardNumber,
+                IdentityCardDate = e.IdentityCardDate,
+                IdentityCardPlace = e.IdentityCardPlace,
+                TaxCode = e.TaxCode,
+                SocialInsuranceNumber = e.SocialInsuranceNumber,
+                BankAccountNumber = e.BankAccountNumber,
+                BankName = e.BankName,
+                BankBranch = e.BankBranch,
+                JoinDate = e.JoinDate,
+                Status = e.Status,
+                DepartmentId = e.DepartmentId,
+                DepartmentName = e.Department?.Name ?? "Chưa phân phòng",
+                PositionId = e.PositionId,
+                PositionName = e.Position?.PositionName ?? "Chưa có chức vụ",
+                ManagerId = e.ManagerId,
+                ManagerName = e.Manager != null
+                    ? $"{e.Manager.LastName} {e.Manager.FirstName}"
+                    : null
+
+            }).ToList(); 
 
             return ServiceResponse<List<EmployeeDto>>.SuccessResponse(result);
         }

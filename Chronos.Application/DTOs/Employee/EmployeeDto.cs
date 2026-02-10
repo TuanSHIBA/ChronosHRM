@@ -12,21 +12,20 @@ namespace Chronos.Application.DTOs.Employee
     {
         public Guid Id { get; set; }
         public string EmployeeCode { get; set; } = string.Empty;
-        public string FullName { get; set; } = string.Empty; // Đã gộp First + Last
+        public string FullName { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string? AvatarUrl { get; set; }
 
-        // Liên hệ
-        public string WorkEmail { get; set; } = string.Empty;
-        public string? PersonalEmail { get; set; }
+        
+        public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
         public string? CurrentAddress { get; set; }
 
-        // Cá nhân
+    
         public DateTime DateOfBirth { get; set; }
-        public Gender Gender { get; set; }               // Frontend sẽ tự map 0->Nam, 1->Nữ
+        public Gender Gender { get; set; }         
         public MaritalStatus MaritalStatus { get; set; }
         public string? PlaceOfBirth { get; set; }
         public string? Hometown { get; set; }
@@ -34,7 +33,7 @@ namespace Chronos.Application.DTOs.Employee
         public string? Religion { get; set; }
         public string? Nationality { get; set; }
 
-        // Pháp lý & Bank
+ 
         public string? IdentityCardNumber { get; set; }
         public DateTime? IdentityCardDate { get; set; }
         public string? IdentityCardPlace { get; set; }
@@ -44,17 +43,16 @@ namespace Chronos.Application.DTOs.Employee
         public string? BankName { get; set; }
         public string? BankBranch { get; set; }
 
-        // Công việc
         public DateTime JoinDate { get; set; }
-        public Guid? PositionId { get; set; } // Cho phép null (lúc mới tạo chưa gán)
-        public Position? Position { get; set; } // Link sang bảng Position
+        public Guid? PositionId { get; set; } 
+        public string? PositionName { get; set; } 
+
         public EmployeeStatus Status { get; set; }
 
-        // Relationship Data (Dữ liệu đã Join bảng)
         public Guid DepartmentId { get; set; }
-        public string? DepartmentName { get; set; } // Để hiện tên phòng ban trên bảng
+        public string? DepartmentName { get; set; }
 
         public Guid? ManagerId { get; set; }
-        public string? ManagerName { get; set; }    // Để hiện tên Sếp quản lý (nếu có)
+        public string? ManagerName { get; set; }  
     }
 }

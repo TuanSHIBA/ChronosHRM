@@ -8,9 +8,9 @@ namespace Chronos.API.Controllers
     [ApiController]
     public class AuthController(IAuthService authService) : ControllerBase
     {
-        // 1. API Đăng ký
+
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto request)
+        public async Task<IActionResult> Register(RegisterDto request)
         {
             try
             {
@@ -23,9 +23,8 @@ namespace Chronos.API.Controllers
             }
         }
 
-        // 2. API Đăng nhập
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto request)
+        public async Task<IActionResult> Login(LoginDto request)
         {
             try
             {
@@ -39,7 +38,7 @@ namespace Chronos.API.Controllers
             }
         }
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] TokenDto request)
+        public async Task<IActionResult> RefreshToken(TokenDto request)
         {
             var result = await authService.RefreshTokenAsync(request);
 

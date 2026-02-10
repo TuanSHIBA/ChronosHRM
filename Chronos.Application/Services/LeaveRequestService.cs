@@ -15,18 +15,11 @@ namespace Chronos.Application.Services
 {
     public class LeaveRequestService(IUnitOfWork _unitOfWork, IMapper _mapper) : ILeaveRequestService
     {
-        //private readonly IUnitOfWork _unitOfWork;
-
-        //public LeaveRequestService(IUnitOfWork unitOfWork)
-        //{
-        //    _unitOfWork = unitOfWork;
-        //}
-
-        public async Task<ServiceResponse<Guid>> CreateRequest(Guid employeeId, CreateLeaveRequestDto request)
+        public async Task<ServiceResponse<LeaveRequestDto>> CreateRequest(Guid employeeId, CreateLeaveRequestDto request)
         {
             // 1. Validate cơ bản
             if (request.FromDate.Date > request.ToDate.Date)
-                return ServiceResponse<Guid>.ErrorResponse("Ngày kết thúc không được nhỏ hơn ngày bắt đầu.");
+                return ServiceResponse<LeaveRequestDto>.ErrorResponse("Ngày kết thúc không được nhỏ hơn ngày bắt đầu.");
 
             double totalDays = 0;
 
@@ -71,8 +64,9 @@ namespace Chronos.Application.Services
 
             await _unitOfWork.LeaveRequest.AddAsync(entity);
             await _unitOfWork.SaveChangesAsync();
+            var result = _mapper.Map<LeaveRequestDto>(entity);
 
-            return ServiceResponse<Guid>.SuccessResponse(entity.Id);
+            return ServiceResponse<LeaveRequestDto>.SuccessResponse(result);
         }
 
         public async Task<ServiceResponse<List<LeaveRequestDto>>> GetMyRequests(Guid employeeId)

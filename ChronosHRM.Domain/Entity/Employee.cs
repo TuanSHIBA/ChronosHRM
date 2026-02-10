@@ -75,8 +75,8 @@ namespace Chronos.Domain.Entity
         public string? BankBranch { get; set; } // Chi nhánh
         public DateTime JoinDate { get; set; } = DateTime.Now;
         public EmployeeStatus Status { get; set; } = EmployeeStatus.Probation;
-        public Guid? PositionId { get; set; } // Cho phép null (lúc mới tạo chưa gán)
-        public Position? Position { get; set; } // Link sang bảng Position
+        public Guid? PositionId { get; set; }
+        public Position? Position { get; set; } 
         public Guid DepartmentId { get; set; }
         public Department? Department { get; set; }
         public Guid? ManagerId { get; set; }

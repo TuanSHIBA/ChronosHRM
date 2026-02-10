@@ -14,7 +14,7 @@ namespace Chronos.API.Controllers
     public class EmployeesController(IEmployeeService service) : ControllerBase
     {
         [HttpGet]
-        [HasPermission(Permissions.Departments.View)]
+        [HasPermission(Permissions.Employees.View)]
         public async Task<IActionResult> GetAll()
         {
             var result = await service.GetAllAsync();
@@ -30,7 +30,7 @@ namespace Chronos.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateEmployeeDto request)
+        public async Task<IActionResult> Create(CreateEmployeeDto request)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace Chronos.API.Controllers
             }
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateEmployeeDto request)
+        public async Task<IActionResult> Update(Guid id, UpdateEmployeeDto request)
         {
             if (id != request.Id) return BadRequest("ID mismatch");
 

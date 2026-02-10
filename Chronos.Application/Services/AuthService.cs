@@ -18,8 +18,6 @@ namespace Chronos.Application.Services
             JwtSettings _jwtSettings, IUnitOfWork _unitOfWork) : IAuthService
     {
    
-
-        // ==================== 1. LOGIN (Giữ nguyên logic Refresh Token) ====================
         public async Task<ServiceResponse<LoginResponseDto>> LoginAsync(LoginDto request)
         {
             // 1. Kiểm tra User & Password (Giữ nguyên)

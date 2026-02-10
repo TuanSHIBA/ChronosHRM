@@ -14,7 +14,7 @@ namespace Chronos.Domain.Entity
         public required string Code { get; set; } // Mã vị trí: POS001, DEV, HR_MGR...
 
         [MaxLength(100)]
-        public required string Title { get; set; } // Tên vị trí: Giám đốc, Kế toán trưởng...
+        public required string PositionName { get; set; }
 
         [MaxLength(500)]
         public string? Description { get; set; } // Mô tả công việc (Job Description)

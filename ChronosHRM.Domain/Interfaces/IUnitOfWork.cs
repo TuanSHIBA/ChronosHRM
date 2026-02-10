@@ -14,6 +14,7 @@ namespace Chronos.Domain.Interfaces
         IAttendanceRepository  Attendance { get; }
         ILeaveTypeRepository LeaveType { get; }
         ILeaveRequestRepository LeaveRequest { get; }
+        IPositionRepository Position { get; }  
         IMenuRepository Menus { get; }
         Task<int> SaveChangesAsync();
     }

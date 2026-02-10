@@ -13,13 +13,11 @@ namespace Chronos.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        // Chỉ Inject IUnitOfWork, không Inject DbContext nữa
         public AttendanceService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        // 1. Lấy thông tin chấm công hôm nay
         public async Task<AttendanceDto?> GetTodayAttendance(Guid employeeId)
         {
             var today = DateTime.Now.Date;
@@ -103,7 +101,6 @@ namespace Chronos.Application.Services
             }
         }
 
-        // 🔴 HÀM CHECK-OUT (Tan ca)
         public async Task<ServiceResponse<AttendanceDto>> CheckOut(Guid employeeId)
         {
             try
@@ -170,7 +167,6 @@ namespace Chronos.Application.Services
            return  ServiceResponse<List<AttendanceRequestDto>>.SuccessResponse(result, "Get Pendung Request Successfully");
         }
 
-        // 2. Hành động Duyệt/Từ chối
         public async Task<string> ApproveRequest(Guid managerUserId, ApproveAttendanceDto request)
         {
             // A. Tìm bản ghi chấm công
@@ -194,7 +190,6 @@ namespace Chronos.Application.Services
 
             return request.IsApproved ? "Đã DUYỆT thành công!" : "Đã TỪ CHỐI yêu cầu.";
         }
-        // AttendanceService.cs
         public async Task<ServiceResponse<List<AttendanceDto>>> GetMyHistory(Guid employeeId, int month, int year)
         {
             var list = await _unitOfWork.Attendance.GetMyAttendanceHistoryAsync(employeeId, month, year);

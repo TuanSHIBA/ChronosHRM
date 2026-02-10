@@ -41,9 +41,14 @@ namespace Chronos.Persistence.Repositories
 
             // 2. Xử lý Include (Vòng lặp thần thánh)
             // Nếu bạn truyền chuỗi "Employee", nó sẽ chạy query.Include("Employee")
-            foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            if (!string.IsNullOrEmpty(includeProperties))
             {
-                query = query.Include(includeProperty);
+                // Tách chuỗi bằng dấu phẩy
+                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    // QUAN TRỌNG: Phải có .Trim() để xóa khoảng trắng thừa
+                    query = query.Include(includeProp.Trim());
+                }
             }
 
             // 3. Xử lý OrderBy

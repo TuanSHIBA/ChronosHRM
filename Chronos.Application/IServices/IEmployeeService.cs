@@ -8,7 +8,6 @@ namespace Chronos.Application.IServices
 {
     public interface IEmployeeService 
     {
- 
         Task<ServiceResponse<List<EmployeeDto>>> GetAllAsync();
         Task<EmployeeDto> GetByAppUserIdAsync(Guid IdUser);
         Task<ServiceResponse<EmployeeDto>> GetByIdAsync(Guid id);

@@ -9,7 +9,6 @@ namespace Chronos.API.Controllers
     [ApiController]
     public class DepartmentsController(IDepartmentService service) : ControllerBase
     {
-        // 1. GET ALL
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -17,7 +16,6 @@ namespace Chronos.API.Controllers
             return Ok(result);
         }
 
-        // 2. GET BY ID
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -27,7 +25,6 @@ namespace Chronos.API.Controllers
             return Ok(result);
         }
 
-        // 3. CREATE
         [HttpPost]
         public async Task<IActionResult> Create(CreateDepartmentDto request)
         {
@@ -35,16 +32,15 @@ namespace Chronos.API.Controllers
 
             if (!result.Success)
             {
-                return BadRequest(result); // Trả về lỗi nếu trùng mã hoặc validate sai
+                return BadRequest(result); 
             }
 
-            // Trả về 201 Created cùng với data (Guid id)
             return CreatedAtAction(nameof(GetById), new { id = result.Data }, result);
         }
 
-        // 4. UPDATE (Giữ nguyên logic tốt của bạn)
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateDepartmentDto request)
+        public async Task<IActionResult> Update(Guid id ,UpdateDepartmentDto request)
         {
             if (id != request.Id)
             {
@@ -63,7 +59,6 @@ namespace Chronos.API.Controllers
             return Ok(result);
         }
 
-        // 5. DELETE
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -71,11 +66,9 @@ namespace Chronos.API.Controllers
 
             if (!result.Success)
             {
-                // Nếu xóa thất bại (VD: Phòng ban đang có nhân viên) -> Trả về lỗi để Frontend hiện Toast
                 return BadRequest(result);
             }
 
-            // Xóa thành công trả về 200 OK kèm message
             return Ok(result);
         }
     }

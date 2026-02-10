@@ -22,6 +22,7 @@ namespace Chronos.Persistence.Repositories
         private ILeaveTypeRepository? _leaveType;
         private ILeaveRequestRepository? _leaveRequest;
         private IMenuRepository? _menus;
+        private IPositionRepository _positions;
         public UnitOfWork(ChronosDbContext context)
         {
             _context = context;
@@ -58,6 +59,12 @@ namespace Chronos.Persistence.Repositories
         {
             get { return _menus ??= new MenuRepository(_context); }
         }
+        public IPositionRepository Position
+        {
+            get { return _positions ??= new PositionRepository(_context); }
+        }
+
+
         public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();
