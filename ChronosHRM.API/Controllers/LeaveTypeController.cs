@@ -17,21 +17,18 @@ namespace Chronos.API.Controllers
         }
 
         [HttpPost]
-        // [Authorize(Roles = "Admin")] // Bật cái này sau
         public async Task<IActionResult> Create(CreateLeaveTypeDto request)
         {
             return Ok(await service.Create(request));
         }
 
         [HttpPut("{id}")]
-        // [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(Guid id, CreateLeaveTypeDto request)
         {
             return Ok(await service.Update(id, request));
         }
 
         [HttpDelete("{id}")]
-        // [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(Guid id)
         {
             return Ok(await service.Delete(id));

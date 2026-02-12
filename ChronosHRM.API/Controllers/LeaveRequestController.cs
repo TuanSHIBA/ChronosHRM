@@ -1,6 +1,8 @@
-﻿using Chronos.API.Extensions;
+﻿using Chronos.API.Attributes;
+using Chronos.API.Extensions;
 using Chronos.Application.DTOs.Leave;
 using Chronos.Application.IServices;
+using Chronos.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,14 +29,15 @@ public class LeaveRequestController(ILeaveRequestService _service) : ControllerB
     }
 
     [HttpGet("pending")]
-    // [Authorize(Policy = "Permissions.Leave.View")] // Sau này bật lên
+    [HasPermission(Permissions.LeaveRequest.Approve)]
     public async Task<IActionResult> GetPending()
     {
         return Ok(await _service.GetPendingRequests());
     }
 
     [HttpPost("approve")]
-    // [Authorize(Policy = "Permissions.Leave.Approve")]
+    [HttpGet("pending-list")]
+    [HasPermission(Permissions.LeaveRequest.Approve)]
     public async Task<IActionResult> Approve(ApproveLeaveRequestDto request)
     {
         var managerId = User.GetEmployeeId();

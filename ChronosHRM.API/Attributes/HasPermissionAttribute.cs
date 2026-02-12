@@ -10,8 +10,6 @@ namespace Chronos.API.Attributes
         {
             Policy = permission;
         }
-
-        // Constructor hỗ trợ ghép chuỗi: [HasPermission("Employees", "View")]
         public HasPermissionAttribute(string resource, string action)
         {
             Policy = $"Permissions.{resource}.{action}";

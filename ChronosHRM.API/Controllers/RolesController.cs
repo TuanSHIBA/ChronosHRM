@@ -49,7 +49,7 @@ namespace Chronos.API.Controllers
             if (role == null) return NotFound();
 
             var claims = await _roleManager.GetClaimsAsync(role);
-            return Ok(claims.Select(c => c.Value)); // Trả về list: ["Employee.View", "Employee.Create"...]
+            return Ok(claims.Select(c => c.Value)); 
         }
 
         [HttpPut("{roleId}/permissions")]
@@ -58,14 +58,14 @@ namespace Chronos.API.Controllers
             var role = await _roleManager.FindByIdAsync(roleId);
             if (role == null) return NotFound();
 
-            // Xóa hết claim cũ của role này
+
             var currentClaims = await _roleManager.GetClaimsAsync(role);
             foreach (var claim in currentClaims)
             {
                 await _roleManager.RemoveClaimAsync(role, claim);
             }
 
-            // Thêm claim mới (User tick chọn từ giao diện)
+
             foreach (var permission in permissionValues)
             {
                 await _roleManager.AddClaimAsync(role, new Claim("Permission", permission));
@@ -76,7 +76,7 @@ namespace Chronos.API.Controllers
         [HttpGet("system-permissions")]
         public IActionResult GetSystemPermissions()
         {
-            // Gọi hàm vừa viết, nó tự động trả về list string đầy đủ
+          
             var permissions = Chronos.Domain.Constants.Permissions.GetAllPermissions();
             return Ok(permissions);
         }

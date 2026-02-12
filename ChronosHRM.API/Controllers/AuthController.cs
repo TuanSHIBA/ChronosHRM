@@ -29,7 +29,7 @@ namespace Chronos.API.Controllers
             try
             {
                 var token = await authService.LoginAsync(request);
-                // Trả về Token cho Client
+
                 return Ok( token );
             }
             catch (Exception ex)
@@ -44,7 +44,7 @@ namespace Chronos.API.Controllers
 
             if (!result.Success)
             {
-                return BadRequest(result); // Token sai hoặc hết hạn hẳn -> Bắt đăng nhập lại
+                return BadRequest(result); 
             }
 
             return Ok(result);

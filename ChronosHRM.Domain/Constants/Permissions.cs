@@ -32,6 +32,7 @@ namespace Chronos.Domain.Constants
             public const string Create = "Permissions.Attendances.Create";
             public const string Edit = "Permissions.Attendances.Edit";
             public const string Delete = "Permissions.Attendances.Delete";
+            public const string Approve = "Permissions.Attendances.Approve";
         }
         public static class LeaveTypes
         {
@@ -46,6 +47,7 @@ namespace Chronos.Domain.Constants
             public const string Create = "Permissions.LeaveRequest.Create";
             public const string Edit = "Permissions.LeaveRequest.Edit";
             public const string Delete = "Permissions.LeaveRequest.Delete";
+            public const string Approve = "Permissions.LeaveRequest.Approve";
         }
         public static class System
         {

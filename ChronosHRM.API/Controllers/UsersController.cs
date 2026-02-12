@@ -80,13 +80,8 @@ namespace Chronos.API.Controllers
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null) return NotFound("User không tồn tại");
-
-            // Lấy các claim được gán trực tiếp cho User (không bao gồm claim từ Role)
             var userClaims = await _userManager.GetClaimsAsync(user);
 
-            // Chỉ lấy Value (ví dụ: "Employee.Create", "Leave.Approve")
-            // Giả sử Claim Type bạn quy định là "Permission"
-            // Nếu bạn dùng claim type khác thì filter ở đây
             return Ok(userClaims.Select(c => c.Value).ToList());
         }
 
