@@ -11,5 +11,6 @@ namespace Chronos.Application.IServices
     public interface IDashboardService
     {
         Task<ServiceResponse<DashboardSummaryDto>> GetSummaryAsync();
+        Task<ServiceResponse<EmployeeDashboardDto>> GetEmployeeSummaryAsync(Guid employeeId);
     }
 }

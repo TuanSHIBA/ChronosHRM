@@ -1,5 +1,6 @@
 ﻿using Chronos.Application.Common.Models; // Import ServiceResponse
 using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
+using Chronos.Application.DTOs.Dashboard;
 using Chronos.Application.DTOs.Employee;
 using Chronos.Domain.Entity;
 using Chronos.Domain.Interfaces;
@@ -14,5 +15,6 @@ namespace Chronos.Application.IServices
         Task<ServiceResponse<EmployeeDto>> CreateAsync(CreateEmployeeDto request);
         Task<ServiceResponse<EmployeeDto>> UpdateAsync(UpdateEmployeeDto request);
         Task<ServiceResponse<bool>> DeleteAsync(Guid id);
+        
     }
 }

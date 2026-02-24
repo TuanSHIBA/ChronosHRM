@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Chronos.Application.Common.Models;
 using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
+using Chronos.Application.DTOs.Dashboard;
 using Chronos.Application.DTOs.Employee;
 
 using Chronos.Application.IServices;
@@ -174,5 +175,6 @@ namespace Chronos.Application.Services
                 return ServiceResponse<bool>.ErrorResponse($"Lỗi khi xóa nhân viên: {ex.Message}");
             }
         }
+    
     }
 }

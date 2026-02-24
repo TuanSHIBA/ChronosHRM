@@ -20,7 +20,6 @@ namespace Chronos.API.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await service.GetByIdAsync(id);
-            // Kiểm tra theo chuẩn ServiceResponse
             if (!result.Success) return NotFound(result);
             return Ok(result);
         }

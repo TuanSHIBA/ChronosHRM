@@ -31,6 +31,9 @@ namespace Chronos.Application.Mappings
             CreateMap<CreateLeaveRequestDto, LeaveRequest>();
             CreateMap<LeaveTypeDto, LeaveType>().ReverseMap();
             CreateMap<PositionDto, Position>().ReverseMap();
+            CreateMap<LeaveRequest, LeaveRequestDto>().ReverseMap();
+
+
 
         }
     }
