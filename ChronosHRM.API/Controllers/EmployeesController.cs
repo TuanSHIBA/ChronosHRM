@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Chronos.Application.Common.Models;
+﻿using Chronos.API.Attributes;
 using Chronos.Application.DTOs.Employee;
-using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
-using Chronos.API.Attributes;
-using Chronos.Domain.Constants;
 using Chronos.Application.IServices;
+using Chronos.Domain.Constants;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Chronos.API.Controllers
 {
@@ -18,10 +16,11 @@ namespace Chronos.API.Controllers
         public async Task<IActionResult> GetAll()
         {
             var result = await service.GetAllAsync();
-            return Ok(result); 
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
+        [HasPermission(Permissions.Employees.View)]
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await service.GetByIdAsync(id);
@@ -30,38 +29,37 @@ namespace Chronos.API.Controllers
         }
 
         [HttpPost]
+        [HasPermission(Permissions.Employees.Create)]
         public async Task<IActionResult> Create(CreateEmployeeDto request)
         {
-            try
-            {
-                var result = await service.CreateAsync(request);
 
-                if (!result.Success)
-                {
-                    return BadRequest(result);
-                }
+            var result = await service.CreateAsync(request);
 
-                // Trả về 201 Created chuẩn RESTful
-                return CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result);
-            }
-            catch(Exception ex)
+            if (!result.Success)
             {
-                return StatusCode(500, ex.Message);
+                return BadRequest(result);
             }
+
+            return CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result);
+
         }
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, UpdateEmployeeDto request)
+        [HttpPut("{id:guid}")]
+        [HasPermission(Permissions.Employees.Edit)]
+        public async Task<ActionResult> Update(Guid id, UpdateEmployeeDto request)
         {
-            if (id != request.Id) return BadRequest("ID mismatch");
+            if (id != request.Id)
+                return BadRequest("ID mismatch");
 
             var result = await service.UpdateAsync(request);
 
-            if (!result.Success) return BadRequest(result);
+            if (!result.Success)
+                return BadRequest(result);
 
-            return Ok(result); 
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
+        [HasPermission(Permissions.Employees.Delete)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await service.DeleteAsync(id);

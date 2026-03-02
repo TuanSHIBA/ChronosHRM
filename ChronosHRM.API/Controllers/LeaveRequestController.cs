@@ -6,41 +6,57 @@ using Chronos.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-[Route("api/[controller]")]
-[ApiController]
 [Authorize]
-public class LeaveRequestController(ILeaveRequestService _service) : ControllerBase
+[ApiController]
+[Route("api/leave-requests")]
+public class LeaveRequestsController(ILeaveRequestService service) : ControllerBase
 {
 
-    [HttpPost("create")]
-    public async Task<IActionResult> Create(CreateLeaveRequestDto request)
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] CreateLeaveRequestDto request)
     {
         var employeeId = User.GetEmployeeId();
-        var result = await _service.CreateRequest(employeeId, request);
-        if (!result.Success) return BadRequest(result);
-        return Ok(result);
+
+        var result = await service.CreateRequest(employeeId, request);
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        return Created("", result);
     }
 
-    [HttpGet("my-history")]
+
+    [HttpGet("me")]
     public async Task<IActionResult> GetMyHistory()
     {
         var employeeId = User.GetEmployeeId();
-        return Ok(await _service.GetMyRequests(employeeId));
+        var result = await service.GetMyRequests(employeeId);
+
+        return Ok(result);
     }
 
     [HttpGet("pending")]
     [HasPermission(Permissions.LeaveRequest.Approve)]
     public async Task<IActionResult> GetPending()
     {
-        return Ok(await _service.GetPendingRequests());
+        var result = await service.GetPendingRequests();
+        return Ok(result);
     }
 
-    [HttpPost("approve")]
-    [HttpGet("pending-list")]
+
+    [HttpPatch("{id:guid}/approve")]
     [HasPermission(Permissions.LeaveRequest.Approve)]
-    public async Task<IActionResult> Approve(ApproveLeaveRequestDto request)
+    public async Task<IActionResult> Approve(
+                                             Guid id,
+                                             ApproveLeaveRequestDto request)
     {
         var managerId = User.GetEmployeeId();
-        return Ok(await _service.ApproveRequest(managerId, request));
+
+        var result = await service.ApproveRequest(managerId, id, request);
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        return Ok(result);
     }
 }

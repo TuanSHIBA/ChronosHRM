@@ -11,11 +11,11 @@ namespace Chronos.Application.IServices
 {
     public interface IAttendanceService
     {
-        Task<AttendanceDto?> GetTodayAttendance(Guid employeeId);
+        Task<ServiceResponse<AttendanceDto>> GetTodayAttendance(Guid employeeId);
         Task<ServiceResponse<AttendanceDto>> CheckIn(Guid employeeId);
         Task<ServiceResponse<AttendanceDto>> CheckOut(Guid employeeId);
         Task<ServiceResponse<List<AttendanceRequestDto>>> GetPendingRequests();
-        Task<string> ApproveRequest(Guid managerUserId, ApproveAttendanceDto request);
+        Task<string> ApproveRequest(Guid managerUserId, Guid attendanceId, ApproveAttendanceDto request);
         Task<ServiceResponse<List<AttendanceDto>>> GetMyHistory(Guid employeeId, int month, int year);
     }
 }

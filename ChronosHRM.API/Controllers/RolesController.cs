@@ -11,7 +11,7 @@ namespace Chronos.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [HasPermission(Permissions.System.Manage)]
     public class RolesController : ControllerBase
     {
@@ -30,7 +30,6 @@ namespace Chronos.API.Controllers
             return Ok(roles);
         }
 
- 
         [HttpPost]
         public async Task<IActionResult> CreateRole(string roleName)
         {

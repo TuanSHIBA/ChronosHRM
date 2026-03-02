@@ -49,6 +49,15 @@ namespace Chronos.Domain.Constants
             public const string Delete = "Permissions.LeaveRequest.Delete";
             public const string Approve = "Permissions.LeaveRequest.Approve";
         }
+        public static class EmployeeTransfers
+        {
+            public const string View = "Permissions.EmployeeTransfers.View";
+            public const string Create = "Permissions.EmployeeTransfers.Create";
+            public const string Edit = "Permissions.EmployeeTransfers.Edit";
+            public const string Delete = "Permissions.EmployeeTransfers.Delete";
+            public const string Approve = "Permissions.EmployeeTransfers.Approve";
+        }
+        
         public static class System
         {
             public const string Manage = "Permissions.System.Manage";

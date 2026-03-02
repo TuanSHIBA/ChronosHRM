@@ -19,60 +19,64 @@ namespace Chronos.Application.Services
 
         public async Task<ServiceResponse<EmploymentContractDto>> CreateAsync(CreateEmploymentContractDto request)
         {
-            // 1. Kiểm tra Nhân viên tồn tại
-            var employee = await unitOfWork.Employees.GetByIdAsync(request.EmployeeId);
-            if (employee == null)
-                return ServiceResponse<EmploymentContractDto>.ErrorResponse("Nhân viên không tồn tại!");
+         
 
-            // 2. Validate dữ liệu Enum (Vì Client gửi số int nên cần kiểm tra xem số đó có nằm trong Enum không)
-            if (!Enum.IsDefined(typeof(ContractType), request.ContractType))
-                return ServiceResponse<EmploymentContractDto>.ErrorResponse("Loại hợp đồng không hợp lệ.");
+                // 1. Kiểm tra Nhân viên tồn tại
+                var employee = await unitOfWork.Employees.GetByIdAsync(request.EmployeeId);
+                if (employee == null)
+                    return ServiceResponse<EmploymentContractDto>.ErrorResponse("Nhân viên không tồn tại!");
 
-            if (!Enum.IsDefined(typeof(ContractStatus), request.Status))
-                return ServiceResponse<EmploymentContractDto>.ErrorResponse("Trạng thái hợp đồng không hợp lệ.");
+                // 2. Validate dữ liệu Enum (Vì Client gửi số int nên cần kiểm tra xem số đó có nằm trong Enum không)
+                if (!Enum.IsDefined(typeof(ContractType), request.ContractType))
+                    return ServiceResponse<EmploymentContractDto>.ErrorResponse("Loại hợp đồng không hợp lệ.");
 
-            // 3. Validate Logic Nghiệp vụ: "Một nhân viên chỉ được có 1 Hợp đồng Hiệu lực (Active) tại một thời điểm"
-            // Ép kiểu int sang Enum để so sánh
-            var newStatus = (ContractStatus)request.Status;
+                if (!Enum.IsDefined(typeof(ContractStatus), request.Status))
+                    return ServiceResponse<EmploymentContractDto>.ErrorResponse("Trạng thái hợp đồng không hợp lệ.");
 
-            // Chỉ kiểm tra trùng nếu người dùng đang cố tạo một hợp đồng "Active"
-            if (newStatus == ContractStatus.Active)
-            {
-                var activeContract = await unitOfWork.EmploymentContracts.GetActiveContractByEmployeeIdAsync(request.EmployeeId);
-                if (activeContract != null)
+                // 3. Validate Logic Nghiệp vụ: "Một nhân viên chỉ được có 1 Hợp đồng Hiệu lực (Active) tại một thời điểm"
+                // Ép kiểu int sang Enum để so sánh
+                var newStatus = (ContractStatus)request.Status;
+
+                // Chỉ kiểm tra trùng nếu người dùng đang cố tạo một hợp đồng "Active"
+                if (newStatus == ContractStatus.Active)
                 {
-                    return ServiceResponse<EmploymentContractDto>.ErrorResponse(
-                        $"Nhân viên {employee.FullName} hiện đang có hợp đồng hiệu lực ({activeContract.ContractCode}). Vui lòng kết thúc hợp đồng cũ trước hoặc lưu hợp đồng mới ở dạng Nháp (Draft).");
+                    var activeContract = await unitOfWork.EmploymentContracts.GetActiveContractByEmployeeIdAsync(request.EmployeeId);
+                    if (activeContract != null)
+                    {
+                        return ServiceResponse<EmploymentContractDto>.ErrorResponse(
+                            $"Nhân viên {employee.FullName} hiện đang có hợp đồng hiệu lực ({activeContract.ContractCode}). Vui lòng kết thúc hợp đồng cũ trước hoặc lưu hợp đồng mới ở dạng Nháp (Draft).");
+                    }
                 }
-            }
 
-            // 4. Validate Thời gian
-            if (request.EndDate.HasValue && request.EndDate < request.StartDate)
-            {
-                return ServiceResponse<EmploymentContractDto>.ErrorResponse("Ngày kết thúc không được nhỏ hơn ngày bắt đầu.");
-            }
+                // 4. Validate Thời gian
+                if (request.EndDate.HasValue && request.EndDate < request.StartDate)
+                {
+                    return ServiceResponse<EmploymentContractDto>.ErrorResponse("Ngày kết thúc không được nhỏ hơn ngày bắt đầu.");
+                }
 
-            // 5. Mapping (AutoMapper tự động map int -> Enum nếu tên field giống nhau)
-            var contract = mapper.Map<EmploymentContract>(request);
+                // 5. Mapping (AutoMapper tự động map int -> Enum nếu tên field giống nhau)
+                var contract = mapper.Map<EmploymentContract>(request);
 
-            // 6. Tự động sinh Mã Hợp Đồng (Format: HD-MNV-01)
-            // Lưu ý: Đếm tất cả hợp đồng kể cả đã xóa hoặc hủy để tránh trùng mã lịch sử
-            int count = await unitOfWork.EmploymentContracts.CountContractsByEmployeeIdAsync(request.EmployeeId);
-            contract.ContractCode = $"HD-{employee.EmployeeCode}-{count + 1:D2}";
+                // 6. Tự động sinh Mã Hợp Đồng (Format: HD-MNV-01)
+                // Lưu ý: Đếm tất cả hợp đồng kể cả đã xóa hoặc hủy để tránh trùng mã lịch sử
+                int count = await unitOfWork.EmploymentContracts.CountContractsByEmployeeIdAsync(request.EmployeeId);
+                contract.ContractCode = $"HD-{employee.EmployeeCode}-{count + 1:D2}";
 
-            // 7. Xử lý logic Lương đóng bảo hiểm (Nếu không nhập thì mặc định bằng Lương cứng)
-            if (contract.InsuranceSalary == 0)
-            {
-                contract.InsuranceSalary = contract.BaseSalary;
-            }
+                // 7. Xử lý logic Lương đóng bảo hiểm (Nếu không nhập thì mặc định bằng Lương cứng)
+                if (contract.InsuranceSalary == 0)
+                {
+                    contract.InsuranceSalary = contract.BaseSalary;
+                }
 
-            // 8. Lưu vào DB
-            await unitOfWork.EmploymentContracts.AddAsync(contract);
-            await unitOfWork.SaveChangesAsync();
+                // 8. Lưu vào DB
+                await unitOfWork.EmploymentContracts.AddAsync(contract);
+                await unitOfWork.SaveChangesAsync();
 
-            // 9. Trả về kết quả
-            var resultDto = mapper.Map<EmploymentContractDto>(contract);
-            return ServiceResponse<EmploymentContractDto>.SuccessResponse(resultDto, "Tạo hồ sơ hợp đồng thành công.");
+                // 9. Trả về kết quả
+                var resultDto = mapper.Map<EmploymentContractDto>(contract);
+                return ServiceResponse<EmploymentContractDto>.SuccessResponse(resultDto, "Tạo hồ sơ hợp đồng thành công.");
+            
+
         }
         public async Task<ServiceResponse<List<EmploymentContractDto>>> GetByEmployeeIdAsync(Guid employeeId)
         {
@@ -96,8 +100,8 @@ namespace Chronos.Application.Services
             var contracts = await unitOfWork.EmploymentContracts.GetAllAsync(includeProperties: "Employee");
             foreach (var item in contracts.ToList())
             {
-                var a = $"{item.Employee.FirstName} {item.Employee.LastName}";
-                var b = item.Employee.FullName;
+                var a = $"{item.Employee?.FirstName} {item.Employee?.LastName}";
+                var b = item.Employee?.FullName;
             }    
             var result = mapper.Map<List<EmploymentContractListDto>>(contracts);
             return ServiceResponse<List<EmploymentContractListDto>>.SuccessResponse(result);

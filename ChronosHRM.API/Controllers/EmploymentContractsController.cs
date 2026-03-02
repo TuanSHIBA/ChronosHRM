@@ -1,6 +1,8 @@
-﻿using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
+﻿using Chronos.API.Attributes;
+using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using Chronos.Application.DTOs.EmploymentContract;
 using Chronos.Application.IServices;
+using Chronos.Domain.Constants;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Chronos.API.Controllers
@@ -10,12 +12,13 @@ namespace Chronos.API.Controllers
     public class EmploymentContractsController(IEmploymentContractService service) : ControllerBase
     {
         [HttpPost]
+        [HasPermission(Permissions.EmploymentContracts.Create)]
         public async Task<IActionResult> Create(CreateEmploymentContractDto request)
         {
             try
             {
-                var id = await service.CreateAsync(request);
-                return StatusCode(201, new { id });
+                var result = await service.CreateAsync(request);
+                return CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result);
             }
             catch (Exception ex)
             {
@@ -24,6 +27,7 @@ namespace Chronos.API.Controllers
         }
 
         [HttpGet("employee/{employeeId}")]
+        [HasPermission(Permissions.EmploymentContracts.View)]
         public async Task<IActionResult> GetByEmployee(Guid employeeId)
         {
             var result = await service.GetByEmployeeIdAsync(employeeId);
@@ -31,6 +35,7 @@ namespace Chronos.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [HasPermission(Permissions.EmploymentContracts.View)]
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await service.GetByIdAsync(id);
@@ -39,6 +44,7 @@ namespace Chronos.API.Controllers
         }
 
         [HttpGet]
+        [HasPermission(Permissions.EmploymentContracts.View)]
         public async Task<IActionResult> GetAllContracts()
         {
             var result = await service.GetAllContractsAsync();
@@ -46,6 +52,7 @@ namespace Chronos.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [HasPermission(Permissions.EmploymentContracts.Edit)]
         public async Task<IActionResult> Update(Guid id, UpdateEmploymentContractDto request)
         {
             if (id != request.Id)
@@ -60,6 +67,7 @@ namespace Chronos.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [HasPermission(Permissions.EmploymentContracts.Delete)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await service.DeleteAsync(id);

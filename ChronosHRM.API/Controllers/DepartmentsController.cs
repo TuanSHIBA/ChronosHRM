@@ -2,6 +2,8 @@
 using Chronos.Application.DTOs.Department;
 using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using Chronos.Application.IServices;
+using Chronos.API.Attributes;
+using Chronos.Domain.Constants;
 
 namespace Chronos.API.Controllers
 {
@@ -10,6 +12,7 @@ namespace Chronos.API.Controllers
     public class DepartmentsController(IDepartmentService service) : ControllerBase
     {
         [HttpGet]
+        [HasPermission(Permissions.Departments.View)]
         public async Task<IActionResult> GetAll()
         {
             var result = await service.GetAllAsync();
@@ -17,6 +20,7 @@ namespace Chronos.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [HasPermission(Permissions.Departments.View)]
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await service.GetByIdAsync(id);
@@ -25,6 +29,7 @@ namespace Chronos.API.Controllers
         }
 
         [HttpPost]
+        [HasPermission(Permissions.Departments.Create)]
         public async Task<IActionResult> Create(CreateDepartmentDto request)
         {
             var result = await service.CreateAsync(request);
@@ -39,6 +44,7 @@ namespace Chronos.API.Controllers
 
 
         [HttpPut("{id}")]
+        [HasPermission(Permissions.Departments.Edit)]
         public async Task<IActionResult> Update(Guid id ,UpdateDepartmentDto request)
         {
             if (id != request.Id)
@@ -59,6 +65,7 @@ namespace Chronos.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [HasPermission(Permissions.Departments.Delete)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await service.DeleteAsync(id);

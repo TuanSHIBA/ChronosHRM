@@ -10,8 +10,8 @@ namespace Chronos.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")] 
-    public class UsersController(UserManager<ApplicationUser> _userManager, RoleManager<ApplicationRole> _roleManage) : ControllerBase
+    [Authorize] 
+    public class UsersController(UserManager<ApplicationUser> _userManager) : ControllerBase
     {
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
@@ -92,7 +92,7 @@ namespace Chronos.API.Controllers
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null) return NotFound("User không tồn tại");
 
-            // 1. Lấy tất cả claim hiện tại của User
+            //lấy tất cả claim hiện tại của User
             var currentClaims = await _userManager.GetClaimsAsync(user);
 
             var claimsToRemove = currentClaims.Where(c => c.Type == "Permission").ToList();

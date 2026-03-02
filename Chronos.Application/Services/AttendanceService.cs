@@ -4,8 +4,6 @@ using Chronos.Application.IServices;
 using Chronos.Domain.Entity;
 using Chronos.Domain.Enums;
 using Chronos.Domain.Interfaces;
-using System;
-using System.Threading.Tasks;
 
 namespace Chronos.Application.Services
 {
@@ -18,14 +16,14 @@ namespace Chronos.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<AttendanceDto?> GetTodayAttendance(Guid employeeId)
+        public async Task<ServiceResponse<AttendanceDto>> GetTodayAttendance(Guid employeeId)
         {
             var today = DateTime.Now.Date;
 
             var entity = (await _unitOfWork.Attendance.GetAllAsync(includeProperties: "Employee")).FirstOrDefault(a => a.EmployeeId == employeeId && a.Date == today);
             if (entity == null)
             {
-                return null;
+                ServiceResponse<AttendanceDto> response = ServiceResponse<AttendanceDto>.ErrorResponse("Không có dữ liệu");
             }
             var attendanceDto = new AttendanceDto
             {
@@ -36,28 +34,25 @@ namespace Chronos.Application.Services
                 EmployeeCode = entity.Employee != null ? entity.Employee.EmployeeCode : "N/A",
 
                 Date = entity.Date,
-                // Format giờ cho đẹp
                 CheckInTime = entity.CheckInTime?.ToString(@"hh\:mm"),
                 CheckOutTime = entity.CheckOutTime?.ToString(@"hh\:mm"),
                 WorkingHours = entity.WorkingHours
             };
-            return attendanceDto;
+            return ServiceResponse<AttendanceDto>.SuccessResponse(attendanceDto);
         }
 
         public async Task<Attendance?> GetByDateAsync(Guid employeeId, DateTime date)
         {
-            return await _unitOfWork.Attendance.GetByDateAsync( employeeId,date.Date);
+            return await _unitOfWork.Attendance.GetByDateAsync(employeeId, date.Date);
         }
 
 
-        // 2. Xử lý Check In
+  
         public async Task<ServiceResponse<AttendanceDto>> CheckIn(Guid employeeId)
         {
-            try
-            {
+           
                 var today = DateTime.Now.Date;
 
-                // 1. Kiểm tra xem đã Check-in chưa (Dùng hàm tối ưu ở Repo)
                 var existingRecord = await _unitOfWork.Attendance.GetByDateAsync(employeeId, today);
 
                 if (existingRecord != null)
@@ -65,16 +60,15 @@ namespace Chronos.Application.Services
                     return ServiceResponse<AttendanceDto>.ErrorResponse("Bạn đã thực hiện Check-in ngày hôm nay rồi!");
                 }
 
-                // 2. Tạo bản ghi mới
                 var newRecord = new Attendance
                 {
                     EmployeeId = employeeId,
                     Date = today,
-                    CheckInTime = DateTime.Now.TimeOfDay, // Lấy giờ hiện tại
+                    CheckInTime = DateTime.Now.TimeOfDay, 
                     CheckOutTime = null,
                     WorkingHours = 0,
 
-                    // 👇 QUAN TRỌNG: Đánh dấu là Chờ duyệt & Nguồn từ Web
+            
                     Status = AttendanceStatus.Pending,
                     Source = AttendanceSource.Web,
                     Note = "Check-in từ xa qua Web"
@@ -82,8 +76,6 @@ namespace Chronos.Application.Services
 
                 await _unitOfWork.Attendance.AddAsync(newRecord);
                 await _unitOfWork.SaveChangesAsync();
-
-                // 3. Map sang DTO để trả về cho Frontend hiển thị ngay lập tức
                 var resultDto = new AttendanceDto
                 {
                     Id = newRecord.Id,
@@ -94,60 +86,46 @@ namespace Chronos.Application.Services
                 };
 
                 return ServiceResponse<AttendanceDto>.SuccessResponse(resultDto, "Check-in thành công! Vui lòng chờ quản lý duyệt.");
-            }
-            catch (Exception ex)
-            {
-                return ServiceResponse<AttendanceDto>.ErrorResponse("Lỗi hệ thống: " + ex.Message);
-            }
+            
+           
         }
 
         public async Task<ServiceResponse<AttendanceDto>> CheckOut(Guid employeeId)
         {
-            try
+
+            var today = DateTime.Now.Date;
+
+            var record = await _unitOfWork.Attendance.GetByDateAsync(employeeId, today);
+
+            if (record == null)
             {
-                var today = DateTime.Now.Date;
-
-                // 1. Tìm bản ghi hôm nay
-                var record = await _unitOfWork.Attendance.GetByDateAsync(employeeId, today);
-
-                if (record == null)
-                {
-                    return ServiceResponse<AttendanceDto>.ErrorResponse("Bạn chưa Check-in nên không thể Check-out!");
-                }
-
-                // 2. Cập nhật giờ ra
-                record.CheckOutTime = DateTime.Now.TimeOfDay;
-
-                // 3. Tính tổng giờ làm (Công thức đơn giản: Ra - Vào)
-                if (record.CheckInTime.HasValue)
-                {
-                    var duration = record.CheckOutTime.Value - record.CheckInTime.Value;
-                    record.WorkingHours = Math.Round(duration.TotalHours, 2); // Làm tròn 2 số lẻ
-                }
-
-                // Lưu ý: Check-out xong vẫn để Status là Pending (hoặc giữ nguyên status cũ)
-                // Vì sếp duyệt là duyệt cả ngày công.
-
-                _unitOfWork.Attendance.Update(record);
-                await _unitOfWork.SaveChangesAsync();
-
-                // 4. Trả về kết quả
-                var result = new AttendanceDto
-                {
-                    Id = record.Id,
-                    Date = record.Date,
-                    CheckInTime = record.CheckInTime?.ToString(@"hh\:mm"),
-                    CheckOutTime = record.CheckOutTime?.ToString(@"hh\:mm"),
-                    WorkingHours = record.WorkingHours,
-                    Status = record.Status.ToString()
-                };
-
-                return ServiceResponse<AttendanceDto>.SuccessResponse(result, "Check-out thành công! Hẹn gặp lại.");
+                return ServiceResponse<AttendanceDto>.ErrorResponse("Bạn chưa Check-in nên không thể Check-out!");
             }
-            catch (Exception ex)
+            if (record.CheckOutTime.HasValue)
             {
-                return ServiceResponse<AttendanceDto>.ErrorResponse("Lỗi hệ thống: " + ex.Message);
+                return ServiceResponse<AttendanceDto>
+                    .ErrorResponse("Bạn đã Check-out rồi!");
             }
+            //  Cập nhật giờ ra
+            record.CheckOutTime = DateTime.Now.TimeOfDay;
+            var duration = record.CheckOutTime.Value - record.CheckInTime.Value;
+            record.WorkingHours = Math.Round(duration.TotalHours, 2); 
+            
+            _unitOfWork.Attendance.Update(record);
+            await _unitOfWork.SaveChangesAsync();
+
+            var result = new AttendanceDto
+            {
+                Id = record.Id,
+                Date = record.Date,
+                CheckInTime = record.CheckInTime?.ToString(@"hh\:mm"),
+                CheckOutTime = record.CheckOutTime?.ToString(@"hh\:mm"),
+                WorkingHours = record.WorkingHours,
+                Status = record.Status.ToString()
+            };
+
+            return ServiceResponse<AttendanceDto>.SuccessResponse(result, "Check-out thành công! Hẹn gặp lại.");
+
         }
         public async Task<ServiceResponse<List<AttendanceRequestDto>>> GetPendingRequests()
         {
@@ -164,13 +142,13 @@ namespace Chronos.Application.Services
                 Note = x.Note,
                 Status = x.Status.ToString()
             }).ToList();
-           return  ServiceResponse<List<AttendanceRequestDto>>.SuccessResponse(result, "Get Pendung Request Successfully");
+            return ServiceResponse<List<AttendanceRequestDto>>.SuccessResponse(result, "Get Pendung Request Successfully");
         }
 
-        public async Task<string> ApproveRequest(Guid managerUserId, ApproveAttendanceDto request)
+        public async Task<string> ApproveRequest(Guid managerUserId,Guid attendanceId, ApproveAttendanceDto request)
         {
             // A. Tìm bản ghi chấm công
-            var attendance = await _unitOfWork.Attendance.GetByIdAsync(request.AttendanceId);
+            var attendance = await _unitOfWork.Attendance.GetByIdAsync(attendanceId);
             if (attendance == null) return "Không tìm thấy yêu cầu chấm công.";
 
             // B. (Tùy chọn) Kiểm tra xem đã duyệt chưa để tránh duyệt lại

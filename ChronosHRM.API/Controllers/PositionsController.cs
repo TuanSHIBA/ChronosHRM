@@ -12,7 +12,6 @@ namespace Chronos.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-//[Authorize] // Bắt buộc đăng nhập mới được lấy dữ liệu
 public class PositionsController(IPositionService positionService) : ControllerBase
 {
     [HttpGet]

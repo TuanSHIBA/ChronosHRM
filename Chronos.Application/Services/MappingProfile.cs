@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chronos.Application.Mappings
+namespace Chronos.Application.Services
 {
     public class MappingProfile : Profile
     {
@@ -27,8 +27,7 @@ namespace Chronos.Application.Mappings
             CreateMap<EmploymentContractDto, EmploymentContract>().ReverseMap();
             CreateMap<EmploymentContractListDto, EmploymentContract>().ReverseMap().ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.Employee.FullName))
             .ForMember(dest => dest.EmployeeCode, opt => opt.MapFrom(src => src.Employee.EmployeeCode)); ;
-            CreateMap< EmploymentContract, CreateEmploymentContractDto>().ReverseMap();
-
+            CreateMap<EmploymentContract, CreateEmploymentContractDto>();
             CreateMap<CreateLeaveRequestDto, LeaveRequest>();
             CreateMap<LeaveTypeDto, LeaveType>().ReverseMap();
             CreateMap<PositionDto, Position>().ReverseMap();

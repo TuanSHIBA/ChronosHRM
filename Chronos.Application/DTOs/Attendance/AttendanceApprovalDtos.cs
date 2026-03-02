@@ -20,7 +20,7 @@ namespace Chronos.Application.DTOs.Attendance
     // 2. Dùng để Sếp gửi hành động duyệt
     public class ApproveAttendanceDto
     {
-        public Guid AttendanceId { get; set; }
+        
         public bool IsApproved { get; set; }    // True = Duyệt, False = Từ chối
         public string? ManagerNote { get; set; } // Ghi chú của sếp (VD: OK, hoặc "Lần sau báo sớm")
     }

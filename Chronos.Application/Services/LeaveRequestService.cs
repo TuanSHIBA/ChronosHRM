@@ -83,9 +83,9 @@ namespace Chronos.Application.Services
             return ServiceResponse<List<LeaveRequestDto>>.SuccessResponse(dtos);
         }
 
-        public async Task<ServiceResponse<bool>> ApproveRequest(Guid managerId, ApproveLeaveRequestDto request)
+        public async Task<ServiceResponse<bool>> ApproveRequest(Guid managerId,Guid requestId, ApproveLeaveRequestDto request)
         {
-            var leaveRequest = await _unitOfWork.LeaveRequest.GetByIdAsync(request.RequestId);
+            var leaveRequest = await _unitOfWork.LeaveRequest.GetByIdAsync(requestId);
             if (leaveRequest == null) return ServiceResponse<bool>.ErrorResponse("Không tìm thấy đơn.");
 
             // Cập nhật trạng thái

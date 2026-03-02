@@ -9,34 +9,25 @@ namespace Chronos.Application.DTOs.EmploymentContract
 {
     public class CreateEmploymentContractDto
     {
-        // 1. LIÊN KẾT
         public Guid EmployeeId { get; set; }
-
-        // 2. PHÁP LÝ & ĐỊNH DANH
-
-        public DateTime SignDate { get; set; } // [MỚI] Ngày ký hợp đồng
-        public int ContractType { get; set; }
-        public int Status { get; set; }
-        public int SalaryType { get; set; }
-        // 3. THỜI GIAN
+        public string ContractCode { get; set; } = "hahahhaa";
+        public DateTime SignDate { get; set; } 
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
-        // 4. CÔNG VIỆC [MỚI]
-        public string? JobTitle { get; set; }        // Chức danh (VD: Senior Dev)
-        public string? WorkingLocation { get; set; } // Địa điểm làm việc
+        public Guid? PositionId { get; set; }    
+        public string? WorkingLocation { get; set; } 
 
-        // 5. LƯƠNG & BHXH
         public decimal BaseSalary { get; set; }
-        public decimal? InsuranceSalary { get; set; } // Lương đóng bảo hiểm (Nullable)
+        public decimal InsuranceSalary { get; set; }
+        public SalaryType SalaryType { get; set; }
+        public ContractType ContractType { get; set; }
+        public ContractStatus Status { get; set; }
+        public decimal MealAllowance { get; set; } = 0;  
+        public decimal TravelAllowance { get; set; } = 0; 
+        public decimal OtherAllowance { get; set; } = 0; 
 
-        // 6. PHỤ CẤP [MỚI] (Mặc định là 0 nếu không nhập)
-        public decimal MealAllowance { get; set; } = 0;   // Ăn trưa
-        public decimal TravelAllowance { get; set; } = 0; // Xăng xe
-        public decimal OtherAllowance { get; set; } = 0;  // Khác
-
-        // 7. KHÁC [MỚI]
         public string? Note { get; set; }
-        public string? AttachmentUrl { get; set; } // Link file PDF
+        public string? AttachmentUrl { get; set; } 
     }
 }

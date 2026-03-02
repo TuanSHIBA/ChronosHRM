@@ -3,11 +3,6 @@ using Chronos.Application.DTOs.Dashboard;
 using Chronos.Application.IServices;
 using Chronos.Domain.Enums;
 using Chronos.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Chronos.Application.Services
 {
@@ -59,19 +54,16 @@ namespace Chronos.Application.Services
         }
         public async Task<ServiceResponse<EmployeeDashboardDto>> GetEmployeeSummaryAsync(Guid employeeId)
         {
-            var today = DateTime.UtcNow.Date; // Hoặc giờ local tùy cấu hình của bạn
+            var today = DateTime.UtcNow.Date;
             var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
 
-            // 1. Lấy dữ liệu chấm công HÔM NAY
-            // Giả sử Entity của bạn là Attendance, có trường Date, CheckInTime, CheckOutTime
             var todayAttendance = (await _unitOfWork.Attendance.GetAllAsync(a => a.EmployeeId == employeeId && a.Date.Date == today)).FirstOrDefault();
-            // 2. Tính số công THÁNG NÀY
+
             var monthAttendances = await _unitOfWork.Attendance.GetAllAsync(
                 a => a.EmployeeId == employeeId && a.Date >= firstDayOfMonth && a.Date <= today);
             var workingDays = monthAttendances.Count(); // Hoặc sum số công nếu có tính nửa ngày
 
-            // 3. Tính Phép năm CÒN LẠI (Năm nay)
-            // Giả sử mặc định mỗi người có 12 ngày phép/năm.
+
             var approvedLeaves = await _unitOfWork.LeaveRequest.GetAllAsync(
                 l => l.EmployeeId == employeeId
                      && l.Status == LeaveStatus.Approved // Chỉ tính đơn đã duyệt
@@ -79,18 +71,41 @@ namespace Chronos.Application.Services
 
             var usedLeaves = approvedLeaves.Sum(l => l.TotalDays); // Tổng số ngày đã nghỉ
             var leaveBalance = 12.0 - usedLeaves; // Cố định 12, sau này có thể lấy từ db cấu hình
+            var attendanceHistory = await _unitOfWork.Attendance.GetAllAsync(
+                            filter: a => a.EmployeeId == employeeId && a.Date <= today,
+                            orderBy: q => q.OrderByDescending(a => a.Date)
+                            );
 
-            // 4. Map vào DTO
+            var top5Attendances = attendanceHistory.Take(5).Select(a => new RecentAttendanceItemDto
+            {
+                Date = a.Date.ToString("dd/MM/yyyy"),
+                CheckIn = a.CheckInTime != null ? a.CheckInTime.Value.ToString(@"hh\:mm") : "--:--",
+                CheckOut = a.CheckOutTime != null ? a.CheckOutTime.Value.ToString(@"hh\:mm") : "--:--",
+                Status = CalculateStatus(a.CheckInTime)
+            }).ToList();
+          
             var result = new EmployeeDashboardDto
             {
-                CheckInTimeToday = todayAttendance?.CheckInTime?.ToString(@"hh\:mm"), // Format giờ:phút
+                CheckInTimeToday = todayAttendance?.CheckInTime?.ToString(@"hh\:mm"), 
                 CheckOutTimeToday = todayAttendance?.CheckOutTime?.ToString(@"hh\:mm") ?? "--:--",
                 WorkingDaysThisMonth = workingDays,
                 LeaveBalance = leaveBalance > 0 ? leaveBalance : 0,
-                OvertimeHours = 0 // Tạm để 0, làm module tăng ca sau
+                OvertimeHours = 0,
+                RecentAttendances = top5Attendances
             };
 
             return ServiceResponse<EmployeeDashboardDto>.SuccessResponse(result);
+        }
+        private string CalculateStatus(TimeSpan? checkInTime)
+        {
+            if (checkInTime == null) return "Vắng mặt";
+
+            // Giả sử 08:00 AM là giờ vào làm. Lớn hơn 8h là Đi muộn
+            if (checkInTime.Value.Hours >= 8 && checkInTime.Value.Minutes > 0)
+            {
+                return "Đi muộn";
+            }
+            return "Đúng giờ";
         }
     }
 }
