@@ -23,16 +23,14 @@ namespace Chronos.Application.Services
             var entity = (await _unitOfWork.Attendance.GetAllAsync(includeProperties: "Employee")).FirstOrDefault(a => a.EmployeeId == employeeId && a.Date == today);
             if (entity == null)
             {
-                ServiceResponse<AttendanceDto> response = ServiceResponse<AttendanceDto>.ErrorResponse("Không có dữ liệu");
+                return ServiceResponse<AttendanceDto>.ErrorResponse("Không có dữ liệu");
             }
             var attendanceDto = new AttendanceDto
             {
                 Id = entity.Id,
                 EmployeeId = entity.EmployeeId,
-                // 👇 Map dữ liệu từ bảng Employee sang
                 EmployeeName = entity.Employee != null ? entity.Employee.FullName : "N/A",
                 EmployeeCode = entity.Employee != null ? entity.Employee.EmployeeCode : "N/A",
-
                 Date = entity.Date,
                 CheckInTime = entity.CheckInTime?.ToString(@"hh\:mm"),
                 CheckOutTime = entity.CheckOutTime?.ToString(@"hh\:mm"),
@@ -147,22 +145,17 @@ namespace Chronos.Application.Services
 
         public async Task<string> ApproveRequest(Guid managerUserId,Guid attendanceId, ApproveAttendanceDto request)
         {
-            // A. Tìm bản ghi chấm công
             var attendance = await _unitOfWork.Attendance.GetByIdAsync(attendanceId);
             if (attendance == null) return "Không tìm thấy yêu cầu chấm công.";
 
-            // B. (Tùy chọn) Kiểm tra xem đã duyệt chưa để tránh duyệt lại
             if (attendance.Status != AttendanceStatus.Pending) return "Yêu cầu này đã được xử lý trước đó.";
 
-            // C. Cập nhật trạng thái
             attendance.Status = request.IsApproved ? AttendanceStatus.Approved : AttendanceStatus.Rejected;
             attendance.ManagerNote = request.ManagerNote;
             attendance.ApprovedAt = DateTime.Now;
 
-            // Lưu vết người duyệt (Sếp)
-            attendance.ApproverId = managerUserId; // Bạn có thể map sang EmployeeId của sếp nếu cần
+            attendance.ApproverId = managerUserId; 
 
-            // D. Lưu vào DB
             _unitOfWork.Attendance.Update(attendance);
             await _unitOfWork.SaveChangesAsync();
 
@@ -176,7 +169,7 @@ namespace Chronos.Application.Services
             {
                 Id = x.Id,
                 EmployeeName = x.Employee?.FullName ?? "",
-                EmployeeCode = x.Employee?.EmployeeCode ?? "", // Có thể null nếu không include
+                EmployeeCode = x.Employee?.EmployeeCode ?? "", 
                 Date = x.Date,
                 CheckInTime = x.CheckInTime?.ToString(@"hh\:mm"),
                 CheckOutTime = x.CheckOutTime?.ToString(@"hh\:mm"),

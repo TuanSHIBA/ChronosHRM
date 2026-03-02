@@ -13,6 +13,7 @@ public class LeaveRequestsController(ILeaveRequestService service) : ControllerB
 {
 
     [HttpPost]
+    [HasPermission(Permissions.LeaveRequest.Create)]
     public async Task<IActionResult> Create([FromBody] CreateLeaveRequestDto request)
     {
         var employeeId = User.GetEmployeeId();
@@ -27,6 +28,7 @@ public class LeaveRequestsController(ILeaveRequestService service) : ControllerB
 
 
     [HttpGet("me")]
+    [HasPermission(Permissions.LeaveRequest.View)]
     public async Task<IActionResult> GetMyHistory()
     {
         var employeeId = User.GetEmployeeId();

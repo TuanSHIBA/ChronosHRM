@@ -64,7 +64,7 @@ namespace Chronos.Persistence.Repositories
         {
             get { return _positions ??= new PositionRepository(_context); }
         }
-        public IEmployeeTransferRepository EmployeeTransfer
+        public IEmployeeTransferRepository EmployeeTransfers
         {
             get { return _employeeTransfer ??= new EmployeeTransferRepository(_context); }
         }

@@ -9,7 +9,7 @@ namespace Chronos.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // Bắt buộc đăng nhập
+    [Authorize]
     public class EmployeeTransfersController(IEmployeeTransferService _service) : ControllerBase
     {
         [HttpGet]

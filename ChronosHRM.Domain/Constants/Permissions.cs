@@ -11,7 +11,13 @@ namespace Chronos.Domain.Constants
             public const string Edit = "Permissions.Employees.Edit";
             public const string Delete = "Permissions.Employees.Delete";
         }
-
+        public static class Positions
+        {
+            public const string View = "Permissions.Positions.View";
+            public const string Create = "Permissions.Positions.Create";
+            public const string Edit = "Permissions.Positions.Edit";
+            public const string Delete = "Permissions.Positions.Delete";
+        }
         public static class Departments
         {
             public const string View = "Permissions.Departments.View";

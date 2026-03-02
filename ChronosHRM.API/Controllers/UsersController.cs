@@ -56,10 +56,10 @@ namespace Chronos.API.Controllers
         }
 
 
-        [HttpPut("{userId}/roles")]
-        public async Task<IActionResult> AssignRoles(Guid userId, [FromBody] List<string> roles)
+        [HttpPut("{id}/roles")]
+        public async Task<IActionResult> AssignRoles(Guid id, [FromBody] List<string> roles)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
+            var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null) return NotFound("User không tồn tại");
 
             // Lấy các role hiện tại
@@ -75,10 +75,10 @@ namespace Chronos.API.Controllers
             return Ok("Cập nhật quyền thành công");
         }
 
-        [HttpGet("{userId}/permissions")]
-        public async Task<IActionResult> GetUserPermissions(Guid userId)
+        [HttpGet("{id}/permissions")]
+        public async Task<IActionResult> GetUserPermissions(Guid id)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
+            var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null) return NotFound("User không tồn tại");
             var userClaims = await _userManager.GetClaimsAsync(user);
 
@@ -86,10 +86,10 @@ namespace Chronos.API.Controllers
         }
 
 
-        [HttpPut("{userId}/permissions")]
-        public async Task<IActionResult> UpdateUserPermissions(Guid userId, [FromBody] List<string> permissionValues)
+        [HttpPut("{id}/permissions")]
+        public async Task<IActionResult> UpdateUserPermissions(Guid id, [FromBody] List<string> permissionValues)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
+            var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null) return NotFound("User không tồn tại");
 
             //lấy tất cả claim hiện tại của User

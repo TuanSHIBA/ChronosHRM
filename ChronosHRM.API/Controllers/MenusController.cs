@@ -11,7 +11,7 @@ namespace Chronos.API.Controllers;
 [Authorize]
 public class MenusController(IMenuService menuService) : ControllerBase
 {
-    [HttpGet("my-menus")]
+    [HttpGet]
     public async Task<IActionResult> GetMyMenus()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
