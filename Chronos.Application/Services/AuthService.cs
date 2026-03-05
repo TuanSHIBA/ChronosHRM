@@ -38,7 +38,8 @@ namespace Chronos.Application.Services
 
             // 4. Update Refresh Token vào DB
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtSettings.DurationInMinutes);
+            //user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtSettings.DurationInMinutes);
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(1);
             await _userManager.UpdateAsync(user);
 
             // 5. Tạo UserDto (Dùng lại biến userRoles và userClaims)

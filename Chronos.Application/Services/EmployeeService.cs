@@ -25,7 +25,7 @@ namespace Chronos.Application.Services
 
         public async Task<ServiceResponse<List<EmployeeDto>>> GetAllAsync()
         {
-            
+           
             var employees = await _unitOfWork.Employees.GetAllAsync(includeProperties: "Department,Position");
 
             var result = employees.Select(e => new EmployeeDto
@@ -92,14 +92,46 @@ namespace Chronos.Application.Services
 
         public async Task<ServiceResponse<EmployeeDto>> CreateAsync(CreateEmployeeDto request)
         {
-
+      
             var department = await _unitOfWork.Departments.GetByIdAsync(request.DepartmentId);
             if (department == null)
-                return ServiceResponse<EmployeeDto>.ErrorResponse("Phòng ban không hợp lệ.");
+                return ServiceResponse<EmployeeDto>.ErrorResponse("Phòng ban không tồn tại.");
 
+            var position = await _unitOfWork.Position.GetByIdAsync(request.PositionId);
+            if (position == null)
+                return ServiceResponse<EmployeeDto>.ErrorResponse("Chức danh/Vị trí không tồn tại.");
+            var employees = (await _unitOfWork.Employees.GetAllAsync(e => e.PhoneNumber == request.PhoneNumber));
+            if (!string.IsNullOrWhiteSpace(request.IdentityCardNumber))
+            {
+               
+                var isCccdExist =  employees.Any(e => e.IdentityCardNumber == request.IdentityCardNumber);
+                if (isCccdExist)
+                    return ServiceResponse<EmployeeDto>.ErrorResponse($"Số CCCD/CMND '{request.IdentityCardNumber}' đã được đăng ký cho nhân viên khác.");
+            }
+           
+            if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
+            {
+                var PhoneNumber = employees.Any(e => e.PhoneNumber == request.PhoneNumber);
+                if (PhoneNumber)
+                    return ServiceResponse<EmployeeDto>.ErrorResponse($"Số điện thoại '{request.PhoneNumber}' đã tồn tại trong hệ thống.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Email))
+            {
+                var isEmailExist = employees.Any(e => e.Email == request.Email);
+                if (isEmailExist)
+                    return ServiceResponse<EmployeeDto>.ErrorResponse($"Email '{request.Email}' đã được sử dụng.");
+            }
+
+                var age = DateTime.Today.Year - request.DateOfBirth.Year;
+            // nếu chưa tới ngày sinh nhật thì không tính đủ tuổi phải trừ đi 1
+                if (request.DateOfBirth.Date > DateTime.Today.AddYears(-age)) 
+                age--;
+
+                if (age < 18)
+                    return ServiceResponse<EmployeeDto>.ErrorResponse($"Nhân viên mới {age} tuổi. Phải đủ 18 tuổi mới đủ điều kiện tiếp nhận.");
+            
             string newCode = await GenerateEmployeeCodeAsync();
-
-            // 3. Map và Lưu
             var employee = _mapper.Map<Employee>(request);
             employee.EmployeeCode = newCode;
 
@@ -107,34 +139,27 @@ namespace Chronos.Application.Services
             await _unitOfWork.SaveChangesAsync();
 
             var result = _mapper.Map<EmployeeDto>(employee);
-            return ServiceResponse<EmployeeDto>.SuccessResponse(result, "Thêm nhân viên thành công.");
+            return ServiceResponse<EmployeeDto>.SuccessResponse(result, "Thêm hồ sơ nhân viên thành công.");
         }
 
         private async Task<string> GenerateEmployeeCodeAsync()
         {
-            // Lấy thời gian hiện tại
+
             var now = DateTime.Now;
 
-            // Tạo prefix: NV + Tháng (2 số) + Năm (2 số cuối)
-            // Ví dụ: Tháng 12 năm 2025 => "NV1225"
             string prefix = $"NV{now:MMyy}";
 
-            // Tìm mã nhân viên cuối cùng trong tháng này
             var lastCode = await _unitOfWork.Employees.GetLastCodeByPrefixAsync(prefix);
 
             if (string.IsNullOrEmpty(lastCode))
             {
-                // Chưa có ai trong tháng này -> Bắt đầu là 001
                 return $"{prefix}001";
             }
 
-            // Nếu đã có (VD: NV1225009) -> Lấy 3 số cuối (009)
-            // Cắt chuỗi lấy 3 ký tự cuối cùng
             string lastNumberStr = lastCode.Substring(lastCode.Length - 3);
 
             if (int.TryParse(lastNumberStr, out int lastNumber))
             {
-                // Tăng lên 1 và format lại thành 3 chữ số (010)
                 return $"{prefix}{(lastNumber + 1):D3}";
             }
 

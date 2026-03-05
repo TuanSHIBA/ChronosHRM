@@ -106,7 +106,7 @@ namespace Chronos.Application.Services
             }
             //  Cập nhật giờ ra
             record.CheckOutTime = DateTime.Now.TimeOfDay;
-            var duration = record.CheckOutTime.Value - record.CheckInTime.Value;
+            var duration = record.CheckOutTime.Value - record.CheckInTime!.Value;
             record.WorkingHours = Math.Round(duration.TotalHours, 2); 
             
             _unitOfWork.Attendance.Update(record);
@@ -138,7 +138,9 @@ namespace Chronos.Application.Services
                 Date = x.Date,
                 CheckInTime = x.CheckInTime?.ToString(@"hh\:mm") ?? "",
                 Note = x.Note,
-                Status = x.Status.ToString()
+                Status = x.Status.ToString(),
+                CheckOutTime= x.CheckOutTime?.ToString(@"hh\:mm") ?? "",
+                WorkingHours = Math.Round((x.CheckOutTime!.Value - x.CheckInTime!.Value).TotalHours,2)
             }).ToList();
             return ServiceResponse<List<AttendanceRequestDto>>.SuccessResponse(result, "Get Pendung Request Successfully");
         }
@@ -174,7 +176,8 @@ namespace Chronos.Application.Services
                 CheckInTime = x.CheckInTime?.ToString(@"hh\:mm"),
                 CheckOutTime = x.CheckOutTime?.ToString(@"hh\:mm"),
                 WorkingHours = x.WorkingHours,
-                Status = x.Status.ToString()
+                Status = x.Status.ToString(),
+                Note = x.Note
             }).ToList();
 
             return ServiceResponse<List<AttendanceDto>>.SuccessResponse(dtoList);

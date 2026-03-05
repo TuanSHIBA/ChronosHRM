@@ -5,7 +5,7 @@
 namespace Chronos.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class addnewtablemenu : Migration
+    public partial class Addnewtablemenu : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

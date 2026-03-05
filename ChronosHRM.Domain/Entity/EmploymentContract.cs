@@ -36,18 +36,18 @@ namespace Chronos.Domain.Entity
         public SalaryType SalaryType { get; set; } 
 
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal InsuranceSalary { get; set; }  // Lương đóng BHXH (Thường thấp hơn BaseSalary)
+        public decimal InsuranceSalary { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal MealAllowance { get; set; } = 0;   // Ăn trưa
+        public decimal MealAllowance { get; set; } = 0; 
 
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal TravelAllowance { get; set; } = 0; // Xăng xe
+        public decimal TravelAllowance { get; set; } = 0;
 
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal OtherAllowance { get; set; } = 0;  // Khác
+        public decimal OtherAllowance { get; set; } = 0; 
 
-        public string? AttachmentUrl { get; set; }    // File scan hợp đồng
+        public string? AttachmentUrl { get; set; }   
 
         [MaxLength(500)]
         public string? Note { get; set; }

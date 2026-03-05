@@ -28,7 +28,7 @@ namespace Chronos.Application.DTOs.Employee
         public required string Address { get; set; }      
         public string? CurrentAddress { get; set; }     
 
-        public string? IdentityCardNumber { get; set; }
+        public required string IdentityCardNumber { get; set; }
         public DateTime? IdentityCardDate { get; set; }
         public string? IdentityCardPlace { get; set; }
         public string? TaxCode { get; set; }
@@ -38,7 +38,7 @@ namespace Chronos.Application.DTOs.Employee
         public string? BankName { get; set; }
         public string? BankBranch { get; set; }
         public DateTime JoinDate { get; set; } = DateTime.Now;
-        public Guid? PositionId { get; set; }
+        public Guid PositionId { get; set; }
         public EmployeeStatus Status { get; set; } = EmployeeStatus.Probation; 
         public Guid DepartmentId { get; set; } 
         public Guid? ManagerId { get; set; }  

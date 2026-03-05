@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Chronos.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class addnewtableposition : Migration
+    public partial class Addnewtableposition : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -34,10 +34,12 @@ namespace Chronos.Persistence.Repositories
 
         public async Task<List<EmploymentContract?>> GetEmploymentContractsByEmployeeIdAsync(Guid employeeId)
         {
-            return await _context.EmploymentContracts.Include(c => c.Employee).
+            var result =  await _context.EmploymentContracts.Include(c => c.Employee).
                             Where(c => c.EmployeeId == employeeId).
                             OrderByDescending(c => c.StartDate).
                             ToListAsync();
+                return result!;
+
         }
 
     }

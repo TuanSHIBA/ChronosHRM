@@ -29,6 +29,7 @@ namespace Chronos.Persistence.Context
         public DbSet<Position> Positions { get; set; }
         public DbSet<AppMenu> AppMenus { get; set; }
         public DbSet<EmployeeTransfer> EmployeeTransfers { get; set; }
+        public DbSet<ContractAnnex> ContractAnnexs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

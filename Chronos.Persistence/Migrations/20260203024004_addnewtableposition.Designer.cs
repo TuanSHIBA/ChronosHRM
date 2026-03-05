@@ -13,7 +13,7 @@ namespace Chronos.Persistence.Migrations
 {
     [DbContext(typeof(ChronosDbContext))]
     [Migration("20260203024004_addnewtableposition")]
-    partial class addnewtableposition
+    partial class Addnewtableposition
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

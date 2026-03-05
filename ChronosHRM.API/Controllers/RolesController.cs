@@ -76,7 +76,7 @@ namespace Chronos.API.Controllers
         public IActionResult GetSystemPermissions()
         {
           
-            var permissions = Chronos.Domain.Constants.Permissions.GetAllPermissions();
+            var permissions = Permissions.GetAllPermissions();
             return Ok(permissions);
         }
     }

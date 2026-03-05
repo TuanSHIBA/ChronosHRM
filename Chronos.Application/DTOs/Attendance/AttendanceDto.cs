@@ -20,6 +20,7 @@ namespace Chronos.Application.DTOs.Attendance
 
         public double WorkingHours { get; set; }
 
-        public string? Status { get; set; } 
+        public string? Status { get; set; }
+        public string Note { get; set; }
     }
 }

@@ -46,7 +46,7 @@ public class LeaveRequestsController(ILeaveRequestService service) : ControllerB
     }
 
 
-    [HttpPatch("{id:guid}/approve")]
+    [HttpPatch("{id}/approve")]
     [HasPermission(Permissions.LeaveRequest.Approve)]
     public async Task<IActionResult> Approve(
                                              Guid id,

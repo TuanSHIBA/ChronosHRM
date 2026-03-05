@@ -9,21 +9,18 @@ namespace Chronos.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmploymentContractsController(IEmploymentContractService service) : ControllerBase
+    public class EmploymentContractsController(IEmploymentContractService service, IContractAnnexService _contractAnnexService) : ControllerBase
     {
         [HttpPost]
         [HasPermission(Permissions.EmploymentContracts.Create)]
         public async Task<IActionResult> Create(CreateEmploymentContractDto request)
         {
-            try
-            {
-                var result = await service.CreateAsync(request);
-                return CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+
+            var result = await service.CreateAsync(request);
+            if (!result.Success)
+                return BadRequest(result);
+            return CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result);
+
         }
 
         [HttpGet("employee/{employeeId}")]
@@ -73,6 +70,23 @@ namespace Chronos.API.Controllers
             var result = await service.DeleteAsync(id);
             if (!result.Success) return BadRequest(result);
             return Ok(result);
+        }
+
+        [HttpGet("{id}/ContractAnnex")]
+        public async Task<IActionResult> GetByContractId(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return BadRequest(new { Message = "ID hợp đồng không hợp lệ." });
+            }
+
+            var response = await _contractAnnexService.GetByContractIdAsync(id);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
         }
     }
 }

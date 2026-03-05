@@ -1,6 +1,7 @@
 ﻿using Chronos.Domain.Entity;
 using Chronos.Domain.Interfaces;
 using Chronos.Persistence.Context;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,8 +23,9 @@ namespace Chronos.Persistence.Repositories
         private ILeaveTypeRepository? _leaveType;
         private ILeaveRequestRepository? _leaveRequest;
         private IMenuRepository? _menus;
-        private IPositionRepository _positions;
-        private IEmployeeTransferRepository _employeeTransfer;
+        private IPositionRepository? _positions;
+        private IEmployeeTransferRepository? _employeeTransfer;
+        private IContractAnnexRepository? _contractAnnex;
         public UnitOfWork(ChronosDbContext context)
         {
             _context = context;
@@ -67,13 +69,20 @@ namespace Chronos.Persistence.Repositories
         public IEmployeeTransferRepository EmployeeTransfers
         {
             get { return _employeeTransfer ??= new EmployeeTransferRepository(_context); }
+        } 
+        public IContractAnnexRepository ContractAnnexes
+        {
+            get { return _contractAnnex ??= new ContractAnnexRepository(_context); }
         }
 
         public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();
         }
-
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            return await _context.Database.BeginTransactionAsync();
+        }
         public void Dispose()
         {
             _context.Dispose();

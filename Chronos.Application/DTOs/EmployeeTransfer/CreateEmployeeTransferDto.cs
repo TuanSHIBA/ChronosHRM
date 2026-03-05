@@ -17,6 +17,8 @@ namespace Chronos.Application.DTOs.EmployeeTransfer
         public Guid? NewManagerId { get; set; }
         public required DateTime EffectiveDate { get; set; }
         public required string Reason { get; set; } = string.Empty;
+        public decimal? NewBaseSalary { get; set; }
+        public decimal? NewAllowanceAmount { get; set; }
         public required TransferType Type { get; set; }
     }
 }

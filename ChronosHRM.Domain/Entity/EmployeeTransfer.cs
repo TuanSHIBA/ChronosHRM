@@ -20,10 +20,10 @@ namespace Chronos.Domain.Entity
         public Guid NewDepartmentId { get; set; }
         public Guid NewPositionId { get; set; }
         public Guid? NewManagerId { get; set; }
-
+        public decimal? NewBaseSalary { get; set; }     
+        public decimal? NewOtherAllowance { get; set; }
         public DateTime EffectiveDate { get; set; } 
         public string Reason { get; set; } = string.Empty; 
-
         public TransferStatus Status { get; set; } = TransferStatus.Pending;
         public TransferType Type { get; set; } = TransferType.Transfer;
     }
