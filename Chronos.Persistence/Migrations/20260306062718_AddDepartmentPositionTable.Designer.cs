@@ -4,6 +4,7 @@ using Chronos.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chronos.Persistence.Migrations
 {
     [DbContext(typeof(ChronosDbContext))]
-    partial class ChronosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260306062718_AddDepartmentPositionTable")]
+    partial class AddDepartmentPositionTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -188,6 +191,45 @@ namespace Chronos.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Departments");
+                });
+
+            modelBuilder.Entity("Chronos.Domain.Entity.DepartmentPosition", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("DepartmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("MaxHeadcount")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("PositionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("PositionId");
+
+                    b.ToTable("DepartmentPosition");
                 });
 
             modelBuilder.Entity("Chronos.Domain.Entity.Employee", b =>
@@ -720,9 +762,6 @@ namespace Chronos.Persistence.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -745,8 +784,6 @@ namespace Chronos.Persistence.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DepartmentId");
 
                     b.ToTable("Positions");
                 });
@@ -885,6 +922,25 @@ namespace Chronos.Persistence.Migrations
                     b.Navigation("Contract");
                 });
 
+            modelBuilder.Entity("Chronos.Domain.Entity.DepartmentPosition", b =>
+                {
+                    b.HasOne("Chronos.Domain.Entity.Department", "Department")
+                        .WithMany("DepartmentPositions")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Chronos.Domain.Entity.Position", "Position")
+                        .WithMany("DepartmentPositions")
+                        .HasForeignKey("PositionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Department");
+
+                    b.Navigation("Position");
+                });
+
             modelBuilder.Entity("Chronos.Domain.Entity.Employee", b =>
                 {
                     b.HasOne("Chronos.Domain.Entity.Department", "Department")
@@ -956,17 +1012,6 @@ namespace Chronos.Persistence.Migrations
                     b.Navigation("LeaveType");
                 });
 
-            modelBuilder.Entity("Chronos.Domain.Entity.Position", b =>
-                {
-                    b.HasOne("Chronos.Domain.Entity.Department", "Department")
-                        .WithMany("Positions")
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Department");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Chronos.Domain.Entity.Identity.ApplicationRole", null)
@@ -1025,9 +1070,9 @@ namespace Chronos.Persistence.Migrations
 
             modelBuilder.Entity("Chronos.Domain.Entity.Department", b =>
                 {
-                    b.Navigation("Employees");
+                    b.Navigation("DepartmentPositions");
 
-                    b.Navigation("Positions");
+                    b.Navigation("Employees");
                 });
 
             modelBuilder.Entity("Chronos.Domain.Entity.Employee", b =>
@@ -1037,6 +1082,8 @@ namespace Chronos.Persistence.Migrations
 
             modelBuilder.Entity("Chronos.Domain.Entity.Position", b =>
                 {
+                    b.Navigation("DepartmentPositions");
+
                     b.Navigation("Employees");
                 });
 #pragma warning restore 612, 618

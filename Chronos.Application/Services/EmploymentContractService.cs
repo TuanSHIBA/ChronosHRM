@@ -135,7 +135,7 @@ namespace Chronos.Application.Services
             // 7. Map ngược lại DTO để trả về cho Frontend
             var resultDto = mapper.Map<EmploymentContractDto>(contract);
 
-            return ServiceResponse<EmploymentContractDto>.SuccessResponse(resultDto, "Cập nhật hợp đồng thành công.");
+            return ServiceResponse<EmploymentContractDto>.SuccessResponse(resultDto, "Cập nhật thành công.");
         }
 
         public async Task<ServiceResponse<bool>> DeleteAsync(Guid id)
@@ -144,7 +144,6 @@ namespace Chronos.Application.Services
             if (contract == null)
                 return ServiceResponse<bool>.ErrorResponse("Hợp đồng không tìm thấy.");
 
-            // Có thể check thêm: Nếu hợp đồng đang Active thì không cho xóa, bắt phải Hủy/Thôi việc
             if (contract.Status == ContractStatus.Active)
                 return ServiceResponse<bool>.ErrorResponse("Không thể xóa hợp đồng đang hiệu lực. Vui lòng chuyển trạng thái sang Hủy hoặc Thôi việc.");
 

@@ -11,19 +11,17 @@ namespace Chronos.Domain.Entity
     public class Position : BaseEntity
     {
         [MaxLength(50)]
-        public required string Code { get; set; } // Mã vị trí: POS001, DEV, HR_MGR...
-
+        public required string Code { get; set; } 
         [MaxLength(100)]
         public required string PositionName { get; set; }
-
         [MaxLength(500)]
-        public string? Description { get; set; } // Mô tả công việc (Job Description)
-
-        // Có thể thêm dải lương gợi ý cho vị trí này (Optional)
+        public string? Description { get; set; } 
         public decimal? BaseSalaryRangeMin { get; set; }
         public decimal? BaseSalaryRangeMax { get; set; }
+        public int Level { get; set; }
+        public Guid DepartmentId { get; set; }
+        public virtual Department Department { get; set; } = null!;
 
-        // Quan hệ: Một vị trí có nhiều nhân viên nắm giữ
-        public ICollection<Employee> Employees { get; set; } = new List<Employee>();
+        public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
     }
 }

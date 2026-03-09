@@ -97,7 +97,7 @@ namespace Chronos.Application.Services
             if (department == null)
                 return ServiceResponse<EmployeeDto>.ErrorResponse("Phòng ban không tồn tại.");
 
-            var position = await _unitOfWork.Position.GetByIdAsync(request.PositionId);
+            var position = await _unitOfWork.Positions.GetByIdAsync(request.PositionId);
             if (position == null)
                 return ServiceResponse<EmployeeDto>.ErrorResponse("Chức danh/Vị trí không tồn tại.");
             var employees = (await _unitOfWork.Employees.GetAllAsync(e => e.PhoneNumber == request.PhoneNumber));

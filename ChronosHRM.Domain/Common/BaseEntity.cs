@@ -13,8 +13,6 @@ namespace Chronos.Domain.Common
         public string? CreatedBy { get; set; }
         public DateTime? LastModifiedAt { get; set; }
         public string? LastModifiedBy { get; set; }
-
-        // Xóa mềm: True nghĩa là đã xóa, không hiện lên UI nhưng vẫn còn trong DB
         public bool IsDeleted { get; set; } = false;
     }
 }

@@ -15,10 +15,11 @@ namespace Chronos.Domain.Interfaces
         IAttendanceRepository  Attendance { get; }
         ILeaveTypeRepository LeaveType { get; }
         ILeaveRequestRepository LeaveRequest { get; }
-        IPositionRepository Position { get; }  
+        IPositionRepository Positions { get; }  
         IMenuRepository Menus { get; }
         IEmployeeTransferRepository EmployeeTransfers { get; }
         IContractAnnexRepository ContractAnnexes { get; }
+        IDepartmentPositionRepository DepartmentPositions { get; }
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task<int> SaveChangesAsync();
     }

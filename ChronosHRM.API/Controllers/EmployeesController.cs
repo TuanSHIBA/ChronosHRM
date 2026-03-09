@@ -43,7 +43,7 @@ namespace Chronos.API.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result);
 
         }
-        [HttpPut("{id:guid}")]
+        [HttpPut("{id}")]
         [HasPermission(Permissions.Employees.Edit)]
         public async Task<ActionResult> Update(Guid id, UpdateEmployeeDto request)
         {

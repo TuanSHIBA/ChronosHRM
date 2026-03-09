@@ -4,6 +4,7 @@ using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using Chronos.Application.IServices;
 using Chronos.API.Attributes;
 using Chronos.Domain.Constants;
+using Chronos.Application.Services;
 
 namespace Chronos.API.Controllers
 {
@@ -76,6 +77,19 @@ namespace Chronos.API.Controllers
             }
 
             return Ok(result);
+        }
+
+        [HttpGet("{departmentId}/positions")]
+        public async Task<IActionResult> GetPositionsByDepartment(Guid id)
+        {
+            var response = await service.GetPositionsByDepartmentIdAsync(id);
+
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+
+            return Ok(response);
         }
     }
 }

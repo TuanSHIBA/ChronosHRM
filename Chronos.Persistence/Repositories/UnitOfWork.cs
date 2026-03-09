@@ -26,6 +26,7 @@ namespace Chronos.Persistence.Repositories
         private IPositionRepository? _positions;
         private IEmployeeTransferRepository? _employeeTransfer;
         private IContractAnnexRepository? _contractAnnex;
+        private IDepartmentPositionRepository? _departmentPositions;
         public UnitOfWork(ChronosDbContext context)
         {
             _context = context;
@@ -62,7 +63,7 @@ namespace Chronos.Persistence.Repositories
         {
             get { return _menus ??= new MenuRepository(_context); }
         }
-        public IPositionRepository Position
+        public IPositionRepository Positions
         {
             get { return _positions ??= new PositionRepository(_context); }
         }
@@ -74,6 +75,11 @@ namespace Chronos.Persistence.Repositories
         {
             get { return _contractAnnex ??= new ContractAnnexRepository(_context); }
         }
+        public IDepartmentPositionRepository DepartmentPositions
+        {
+            get { return _departmentPositions ??= new DepartmentPositionRepository(_context); }
+        }
+  
 
         public async Task<int> SaveChangesAsync()
         {

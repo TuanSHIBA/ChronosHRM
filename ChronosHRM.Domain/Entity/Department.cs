@@ -9,9 +9,10 @@ namespace Chronos.Domain.Entity
 {
     public class Department : BaseEntity
     {
-        public string Name { get; set; } = string.Empty; 
-        public string Code { get; set; } = string.Empty; 
+        public string Name { get; set; } = string.Empty;
+        public string Code { get; set; } = string.Empty;
 
-        public ICollection<Employee> Employees { get; set; } = new List<Employee>();
+        public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
+        public virtual ICollection<Position> Positions { get; set; } = new List<Position>();
     }
 }

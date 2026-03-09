@@ -14,5 +14,6 @@ namespace Chronos.Application.IServices
         Task<ServiceResponse<PositionDto>> CreateAsync(CreatePositionDto positionDto);
         Task<ServiceResponse<IEnumerable<PositionDto>>> GetAllAsync();
         Task<ServiceResponse<bool>> DeleteAsync(Guid positionId);
+        Task<ServiceResponse<PositionDto>> UpdateAsync(Guid positionId, UpdatePositionDto positionDto);
     }
 }

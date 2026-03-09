@@ -36,10 +36,8 @@ namespace Chronos.Application.Services
             var accessToken = await GenerateAccessTokenAsync(user, userRoles, userClaims);
             var refreshToken = GenerateRefreshToken();
 
-            // 4. Update Refresh Token vào DB
             user.RefreshToken = refreshToken;
-            //user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtSettings.DurationInMinutes);
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(1);
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtSettings.DurationInMinutes);
             await _userManager.UpdateAsync(user);
 
             // 5. Tạo UserDto (Dùng lại biến userRoles và userClaims)
@@ -175,7 +173,7 @@ namespace Chronos.Application.Services
             }, "Làm mới Token thành công!");
         }
 
-        // ==================== HELPER: ĐỌC TOKEN HẾT HẠN ====================
+
         private ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
         {
             var tokenValidationParameters = new TokenValidationParameters

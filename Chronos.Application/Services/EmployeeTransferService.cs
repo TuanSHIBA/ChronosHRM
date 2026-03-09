@@ -15,7 +15,7 @@ namespace Chronos.Application.Services
             var departments = await _unitOfWork.Departments.GetAllAsync();
             var deptDict = departments.ToDictionary(d => d.Id, d => d.Name);
 
-            var positions = await _unitOfWork.Position.GetAllAsync();
+            var positions = await _unitOfWork.Positions.GetAllAsync();
             var posDict = positions.ToDictionary(p => p.Id, p => p.PositionName);
 
             // 3. Map dữ liệu sang DTO

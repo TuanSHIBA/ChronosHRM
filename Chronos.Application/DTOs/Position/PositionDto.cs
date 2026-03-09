@@ -14,6 +14,9 @@ namespace Chronos.Application.DTOs.Position
         public string? Description { get; set; }
         public decimal? BaseSalaryRangeMin { get; set; }
         public decimal? BaseSalaryRangeMax { get; set; }
+        public int Level { get; set; }
+        public Guid DepartmentId { get; set; }
+        public string DepartmentName { get; set; } = string.Empty;
 
     }
 }
