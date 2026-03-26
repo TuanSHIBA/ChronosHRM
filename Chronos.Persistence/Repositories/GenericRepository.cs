@@ -33,20 +33,19 @@ namespace Chronos.Persistence.Repositories
         {
             IQueryable<T> query = _dbSet;
 
-            // 1. Xử lý Filter (ví dụ: lấy theo EmployeeId)
             if (filter != null)
             {
                 query = query.Where(filter);
             }
 
-            // 2. Xử lý Include (Vòng lặp thần thánh)
-            // Nếu bạn truyền chuỗi "Employee", nó sẽ chạy query.Include("Employee")
-            foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            if (!string.IsNullOrEmpty(includeProperties))
             {
-                query = query.Include(includeProperty);
+                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {                  
+                    query = query.Include(includeProp.Trim());
+                }
             }
 
-            // 3. Xử lý OrderBy
             if (orderBy != null)
             {
                 return await orderBy(query).ToListAsync();

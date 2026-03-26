@@ -26,33 +26,34 @@ namespace Chronos.Persistence.Context
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<LeaveType> LeaveTypes { get; set; }
         public DbSet<LeaveRequest> LeaveRequests { get; set; }
+        public DbSet<Position> Positions { get; set; }
+        public DbSet<AppMenu> AppMenus { get; set; }
+        public DbSet<EmployeeTransfer> EmployeeTransfers { get; set; }
+        public DbSet<ContractAnnex> ContractAnnexs { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // 1. Cấu hình mối quan hệ (Fluent API)
-
-            // Department - Employee (1-N)
+           
             modelBuilder.Entity<Department>()
                 .HasMany(d => d.Employees)
                 .WithOne(e => e.Department)
                 .HasForeignKey(e => e.DepartmentId)
-                .OnDelete(DeleteBehavior.Restrict); // Xóa phòng ban không được xóa nhân viên (tránh mất dữ liệu)
+                .OnDelete(DeleteBehavior.Restrict); 
 
-            // Employee - Contract (1-N)
+
             modelBuilder.Entity<Employee>()
                 .HasMany(e => e.Contracts)
                 .WithOne(c => c.Employee)
                 .HasForeignKey(c => c.EmployeeId)
-                .OnDelete(DeleteBehavior.Cascade); // Xóa nhân viên thì xóa luôn hợp đồng (hoặc Restrict tùy nghiệp vụ)
+                .OnDelete(DeleteBehavior.Cascade); 
 
-            // Self-Referencing: Manager - Staff (1-N)
+  
             modelBuilder.Entity<Employee>()
                 .HasOne(e => e.Manager)
-                .WithMany() // Manager có nhiều nhân viên (nhưng trong Entity ta chưa khai báo List<Employee> Subordinates nên để trống)
+                .WithMany() 
                 .HasForeignKey(e => e.ManagerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // 2. Cấu hình Global Query Filter cho Soft Delete
-            // Tự động bỏ qua những bản ghi có IsDeleted = true khi query
             modelBuilder.Entity<Employee>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<Department>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<EmploymentContract>().HasQueryFilter(x => !x.IsDeleted);
@@ -60,7 +61,7 @@ namespace Chronos.Persistence.Context
             base.OnModelCreating(modelBuilder);
         }
 
-        // Tự động cập nhật CreatedAt và LastModifiedAt
+       
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             foreach (var entry in ChangeTracker.Entries<BaseEntity>())

@@ -2,7 +2,6 @@
 using Chronos.Application.Common.Settings;
 using Chronos.Application.DTOs.Employee;
 using Chronos.Application.IServices;
-using Chronos.Application.Mappings;
 using Chronos.Application.Services;
 using Chronos.Domain.Entity.Identity;
 using Chronos.Domain.Interfaces;
@@ -18,7 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using System.Text;
-using System.Text.Json; // 👈 Nhớ using cái này
+using System.Text.Json; 
 
 namespace ChronosHRM.API
 {
@@ -44,6 +43,12 @@ namespace ChronosHRM.API
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IAttendanceService, AttendanceService>();
             builder.Services.AddScoped<ILeaveTypeService, LeaveTypeService>();
+            builder.Services.AddScoped<ILeaveRequestService, LeaveRequestService>();
+            builder.Services.AddScoped<IDashboardService, DashboardService>();
+            builder.Services.AddScoped<IPositionService, PositionService>();
+            builder.Services.AddScoped<IMenuService, MenuService>();
+            builder.Services.AddScoped<IEmployeeTransferService, EmployeeTransferService>();
+            builder.Services.AddScoped<IContractAnnexService, ContractAnnexService>();
             // tài liệu ASP.NET Core Custom Authorization Policy Providers
             builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
             builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();

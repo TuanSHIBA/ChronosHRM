@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Chronos.Application.DTOs.Employee
 {
-    public class UpdateEmployeeDto : CreateEmployeeDto // Có thể kế thừa từ Create cho nhanh
+    public class UpdateEmployeeDto : CreateEmployeeDto 
     {
-        public Guid Id { get; set; } // 👈 Bắt buộc phải có cái này
+        public Guid Id { get; set; } 
     }
 }

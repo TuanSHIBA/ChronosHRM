@@ -1,4 +1,5 @@
 ﻿using Chronos.Domain.Entity;
+using Chronos.Domain.Enums;
 using Chronos.Domain.Interfaces;
 using Chronos.Persistence.Context;
 using Microsoft.EntityFrameworkCore;

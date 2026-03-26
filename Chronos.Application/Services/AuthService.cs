@@ -18,8 +18,6 @@ namespace Chronos.Application.Services
             JwtSettings _jwtSettings, IUnitOfWork _unitOfWork) : IAuthService
     {
    
-
-        // ==================== 1. LOGIN (Giữ nguyên logic Refresh Token) ====================
         public async Task<ServiceResponse<LoginResponseDto>> LoginAsync(LoginDto request)
         {
             // 1. Kiểm tra User & Password (Giữ nguyên)
@@ -35,10 +33,9 @@ namespace Chronos.Application.Services
             var userClaims = await _userManager.GetClaimsAsync(user);
 
 
-            var accessToken = GenerateAccessTokenAsync(user, userRoles, userClaims);
+            var accessToken = await GenerateAccessTokenAsync(user, userRoles, userClaims);
             var refreshToken = GenerateRefreshToken();
 
-            // 4. Update Refresh Token vào DB
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtSettings.DurationInMinutes);
             await _userManager.UpdateAsync(user);
@@ -46,6 +43,7 @@ namespace Chronos.Application.Services
             // 5. Tạo UserDto (Dùng lại biến userRoles và userClaims)
             var userDto = new UserDto
             {
+                Username = user.UserName!,
                 Id = user.Id.ToString(),
                 FullName = user.FullName,
                 Roles = userRoles.ToList(),
@@ -105,12 +103,13 @@ namespace Chronos.Application.Services
                 new Claim("fullName", user.FullName ?? "")
             };
             var employee = (await _unitOfWork.Employees.GetByAppUserIdAsync(user.Id));
-            authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-            authClaims.AddRange(claims);
             if (employee != null)
             {
                 claims.Add(new Claim("EmployeeId", employee.Id.ToString()));
             }
+            authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            authClaims.AddRange(claims);
+            
             // 3. Ký Token (Giữ nguyên logic cũ của bạn)
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
 
@@ -157,7 +156,7 @@ namespace Chronos.Application.Services
             var userClaims = await _userManager.GetClaimsAsync(user);
 
             // 3. Sinh Access Token mới (Truyền roles và claims vào hàm GenerateAccessToken mới)
-            var newAccessToken = GenerateAccessTokenAsync(user, userRoles, userClaims);
+            var newAccessToken = await GenerateAccessTokenAsync(user, userRoles, userClaims);
 
             // 4. Sinh Refresh Token mới
             var newRefreshToken = GenerateRefreshToken();
@@ -174,7 +173,7 @@ namespace Chronos.Application.Services
             }, "Làm mới Token thành công!");
         }
 
-        // ==================== HELPER: ĐỌC TOKEN HẾT HẠN ====================
+
         private ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
         {
             var tokenValidationParameters = new TokenValidationParameters

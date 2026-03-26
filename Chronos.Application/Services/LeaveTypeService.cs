@@ -1,4 +1,5 @@
-﻿using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
+﻿using AutoMapper;
+using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using Chronos.Application.DTOs.Leave;
 using Chronos.Application.IServices;
 using Chronos.Domain.Entity;
@@ -7,18 +8,12 @@ using Chronos.Domain.Interfaces;
 namespace Chronos.Application.Services
 {
 
-    public class LeaveTypeService : ILeaveTypeService
+    public class LeaveTypeService(IUnitOfWork unitOfWork, IMapper _mapper) : ILeaveTypeService
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public LeaveTypeService(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
-
+  
         public async Task<ServiceResponse<List<LeaveTypeDto>>> GetAll()
         {
-            var list = await _unitOfWork.LeaveType.GetAllAsync();
+            var list = await unitOfWork.LeaveType.GetAllAsync();
             var dtos = list.Select(x => new LeaveTypeDto
             {
                 Id = x.Id,
@@ -32,58 +27,47 @@ namespace Chronos.Application.Services
 
         public async Task<ServiceResponse<LeaveTypeDto>> GetById(Guid id)
         {
-            var item = await _unitOfWork.LeaveType.GetByIdAsync(id);
+            var item = await unitOfWork.LeaveType.GetByIdAsync(id);
             if (item == null) return ServiceResponse<LeaveTypeDto>.ErrorResponse("Không tìm thấy");
 
-            return ServiceResponse<LeaveTypeDto>.SuccessResponse(new LeaveTypeDto
-            {
-                Id = item.Id,
-                Name = item.Name!,
-                Description = item.Description,
-                DefaultDays = item.DefaultDays,
-                IsPaid = item.IsPaid
-            });
+            var result = _mapper.Map<LeaveTypeDto>(item);
+            return ServiceResponse<LeaveTypeDto>.SuccessResponse(result);
         }
 
-        public async Task<ServiceResponse<Guid>> Create(CreateLeaveTypeDto request)
+        public async Task<ServiceResponse<LeaveTypeDto>> Create(CreateLeaveTypeDto request)
         {
-            var entity = new LeaveType
-            {
-                Id = Guid.NewGuid(),
-                Name = request.Name!,
-                Description = request.Description,
-                DefaultDays = request.DefaultDays,
-                IsPaid = request.IsPaid,
-            };
 
-            await _unitOfWork.LeaveType.AddAsync(entity);
-            await _unitOfWork.SaveChangesAsync();
-            return ServiceResponse<Guid>.SuccessResponse(entity.Id);
+            var entity = _mapper.Map<LeaveType>(request);
+            await unitOfWork.LeaveType.AddAsync(entity);
+            await unitOfWork.SaveChangesAsync();
+
+            var responseDto = _mapper.Map<LeaveTypeDto>(entity);
+
+            return ServiceResponse<LeaveTypeDto>.SuccessResponse(responseDto, "Tạo thành công!");
         }
 
-        public async Task<ServiceResponse<bool>> Update(Guid id, CreateLeaveTypeDto request)
+        public async Task<ServiceResponse<LeaveTypeDto>> Update(Guid id, CreateLeaveTypeDto request)
         {
-            var item = await _unitOfWork.LeaveType.GetByIdAsync(id);
-            if (item == null) return ServiceResponse<bool>.ErrorResponse("Không tìm thấy");
+            var item = await unitOfWork.LeaveType.GetByIdAsync(id);
+            if (item == null)
+                return ServiceResponse<LeaveTypeDto>.ErrorResponse("Không tìm thấy dữ liệu");
 
-            item.Name = request.Name!;
-            item.Description = request.Description;
-            item.DefaultDays = request.DefaultDays;
-            item.IsPaid = request.IsPaid;
-            item.LastModifiedAt = DateTime.Now;
+            _mapper.Map(request, item);
 
-            _unitOfWork.LeaveType.Update(item);
-            await _unitOfWork.SaveChangesAsync();
-            return ServiceResponse<bool>.SuccessResponse(true);
+            item.LastModifiedAt = DateTime.UtcNow;
+            unitOfWork.LeaveType.Update(item);
+            await unitOfWork.SaveChangesAsync();
+            var responseDto = _mapper.Map<LeaveTypeDto>(item);
+            return ServiceResponse<LeaveTypeDto>.SuccessResponse(responseDto, "Cập nhật thành công!");
         }
 
         public async Task<ServiceResponse<bool>> Delete(Guid id)
         {
-            var item = await _unitOfWork.LeaveType.GetByIdAsync(id);
+            var item = await unitOfWork.LeaveType.GetByIdAsync(id);
             if (item == null) return ServiceResponse<bool>.ErrorResponse("Không tìm thấy");
 
-            _unitOfWork.LeaveType.Delete(item);
-            await _unitOfWork.SaveChangesAsync();
+            unitOfWork.LeaveType.Delete(item);
+            await unitOfWork.SaveChangesAsync();
             return ServiceResponse<bool>.SuccessResponse(true);
         }
     }

@@ -1,7 +1,9 @@
-﻿using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
+﻿using AutoMapper;
+using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using Chronos.Application.DTOs.Leave;
 using Chronos.Application.IServices;
 using Chronos.Domain.Entity;
+using Chronos.Domain.Enums;
 using Chronos.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -11,42 +13,60 @@ using System.Threading.Tasks;
 
 namespace Chronos.Application.Services
 {
-    public class LeaveRequestService : ILeaveRequestService
+    public class LeaveRequestService(IUnitOfWork _unitOfWork, IMapper _mapper) : ILeaveRequestService
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public LeaveRequestService(IUnitOfWork unitOfWork)
+        public async Task<ServiceResponse<LeaveRequestDto>> CreateRequest(Guid employeeId, CreateLeaveRequestDto request)
         {
-            _unitOfWork = unitOfWork;
-        }
+            // 1. Validate cơ bản
+            if (request.FromDate.Date > request.ToDate.Date)
+                return ServiceResponse<LeaveRequestDto>.ErrorResponse("Ngày kết thúc không được nhỏ hơn ngày bắt đầu.");
 
-        public async Task<ServiceResponse<Guid>> CreateRequest(Guid employeeId, CreateLeaveRequestDto request)
-        {
-            // 1. Validate ngày
-            if (request.FromDate > request.ToDate)
-                return ServiceResponse<Guid>.ErrorResponse("Ngày bắt đầu phải trước ngày kết thúc.");
+            double totalDays = 0;
 
-            // 2. Tính số ngày (Đơn giản: Trừ nhau + 1)
-            // Nâng cao sau này: Trừ thứ 7, CN, ngày lễ
-            var totalDays = (request.ToDate - request.FromDate).TotalDays + 1;
+            // 2. PHÂN LOẠI XỬ LÝ
 
-            var entity = new LeaveRequest
+            // TRƯỜNG HỢP A: Nghỉ nhiều ngày (Khác ngày)
+            if (request.FromDate.Date != request.ToDate.Date)
             {
-                Id = Guid.NewGuid(),
-                EmployeeId = employeeId,
-                LeaveTypeId = request.LeaveTypeId,
-                FromDate = request.FromDate,
-                ToDate = request.ToDate,
-                TotalDays = totalDays,
-                Reason = request.Reason,
-                Status = LeaveStatus.Pending,
-                CreatedAt = DateTime.Now
-            };
+                // Khi nghỉ nhiều ngày, BẮT BUỘC phải tính là Full Day
+                // Không chấp nhận chuyện chọn Session Sáng/Chiều ở đây
+                // (Nếu user muốn nghỉ lẻ tẻ, họ phải tách làm 2 đơn như bạn đã quyết định)
+
+                totalDays = (request.ToDate.Date - request.FromDate.Date).TotalDays + 1;
+            }
+            // TRƯỜNG HỢP B: Nghỉ trong 1 ngày (Cùng ngày)
+            else
+            {
+                if (request.Session == LeaveSession.Morning || request.Session == LeaveSession.Afternoon)
+                {
+                    totalDays = 0.5; // Nửa buổi
+                }
+                else
+                {
+                    totalDays = 1.0; // Cả ngày hôm đó
+                }
+            }
+
+            // 3. Map và Lưu (Đơn giản như đan rổ)
+            var entity = _mapper.Map<LeaveRequest>(request);
+
+            // Gán các giá trị tính toán
+            entity.Id = Guid.NewGuid();
+            entity.EmployeeId = employeeId;
+            entity.TotalDays = totalDays;
+
+            // Lưu session để hiển thị lại cho đúng (VD: Nghỉ Sáng 20/05)
+            // Nếu nghỉ nhiều ngày thì mặc định lưu AllDay
+            entity.Session = (request.FromDate.Date != request.ToDate.Date) ? LeaveSession.AllDay : request.Session;
+
+            entity.Status = LeaveStatus.Pending;
+            entity.CreatedAt = DateTime.Now;
 
             await _unitOfWork.LeaveRequest.AddAsync(entity);
             await _unitOfWork.SaveChangesAsync();
+            var result = _mapper.Map<LeaveRequestDto>(entity);
 
-            return ServiceResponse<Guid>.SuccessResponse(entity.Id);
+            return ServiceResponse<LeaveRequestDto>.SuccessResponse(result);
         }
 
         public async Task<ServiceResponse<List<LeaveRequestDto>>> GetMyRequests(Guid employeeId)
@@ -63,9 +83,9 @@ namespace Chronos.Application.Services
             return ServiceResponse<List<LeaveRequestDto>>.SuccessResponse(dtos);
         }
 
-        public async Task<ServiceResponse<bool>> ApproveRequest(Guid managerId, ApproveLeaveRequestDto request)
+        public async Task<ServiceResponse<bool>> ApproveRequest(Guid managerId,Guid requestId, ApproveLeaveRequestDto request)
         {
-            var leaveRequest = await _unitOfWork.LeaveRequest.GetByIdAsync(request.RequestId);
+            var leaveRequest = await _unitOfWork.LeaveRequest.GetByIdAsync(requestId);
             if (leaveRequest == null) return ServiceResponse<bool>.ErrorResponse("Không tìm thấy đơn.");
 
             // Cập nhật trạng thái

@@ -1,5 +1,6 @@
 ﻿using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using Chronos.Application.DTOs.Department;
+using Chronos.Application.DTOs.Position;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,8 @@ namespace Chronos.Application.IServices
         Task<ServiceResponse<DepartmentDto>> CreateAsync(CreateDepartmentDto request);
         Task<ServiceResponse<DepartmentDto>> UpdateAsync(UpdateDepartmentDto request);
         Task<ServiceResponse<bool>> DeleteAsync(Guid id);
+        Task<ServiceResponse<bool>> AddPositionToDepartmentAsync(Guid departmentId, Guid positionId);
+        Task<ServiceResponse<bool>> RemovePositionFromDepartmentAsync(Guid departmentId, Guid positionId);
+        Task<ServiceResponse<IEnumerable<PositionDto>>> GetPositionsByDepartmentIdAsync(Guid departmentId);
     }
 }

@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Chronos.Domain.Enums;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,13 +12,36 @@ namespace Chronos.Application.DTOs.Employee
     {
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
-        public required string Email { get; set; }
+        public required string Email { get; set; } 
         public required string PhoneNumber { get; set; }
+        public string? AvatarUrl { get; set; }
         public DateTime DateOfBirth { get; set; }
-        public required string? Address { get; set; }
-        public Guid DepartmentId { get; set; }
-        public Guid? ManagerId { get; set; }
-        public int Status { get; set; }
+        public Gender Gender { get; set; } = Gender.Male;
+        public MaritalStatus MaritalStatus { get; set; } = MaritalStatus.Single;
+
+        public string? PlaceOfBirth { get; set; }
+        public string? Hometown { get; set; }
+        public string? Ethnicity { get; set; }
+        public string? Religion { get; set; } 
+        public string? Nationality { get; set; } = "Việt Nam";
+
+        public required string Address { get; set; }      
+        public string? CurrentAddress { get; set; }     
+
+        public required string IdentityCardNumber { get; set; }
+        public DateTime? IdentityCardDate { get; set; }
+        public string? IdentityCardPlace { get; set; }
+        public string? TaxCode { get; set; }
+        public string? SocialInsuranceNumber { get; set; }
+
+        public string? BankAccountNumber { get; set; }
+        public string? BankName { get; set; }
+        public string? BankBranch { get; set; }
+        public DateTime JoinDate { get; set; } = DateTime.Now;
+        public Guid PositionId { get; set; }
+        public EmployeeStatus Status { get; set; } = EmployeeStatus.Probation; 
+        public Guid DepartmentId { get; set; } 
+        public Guid? ManagerId { get; set; }  
     }
 
     public class CreateEmployeeValidator : AbstractValidator<CreateEmployeeDto>

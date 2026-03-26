@@ -10,9 +10,9 @@ namespace Chronos.Application.IServices
 {
     public interface ILeaveRequestService
     {
-        Task<ServiceResponse<Guid>> CreateRequest(Guid employeeId, CreateLeaveRequestDto request);
+        Task<ServiceResponse<LeaveRequestDto>> CreateRequest(Guid employeeId, CreateLeaveRequestDto request);
         Task<ServiceResponse<List<LeaveRequestDto>>> GetMyRequests(Guid employeeId);
         Task<ServiceResponse<List<LeaveRequestDto>>> GetPendingRequests(); // Cho Manager
-        Task<ServiceResponse<bool>> ApproveRequest(Guid managerId, ApproveLeaveRequestDto request); // Cho Manager
+        Task<ServiceResponse<bool>> ApproveRequest(Guid managerId, Guid requestId, ApproveLeaveRequestDto request); // Cho Manager
     }
 }

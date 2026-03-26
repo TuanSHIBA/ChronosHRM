@@ -1,52 +1,64 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+﻿using Chronos.API.Attributes;
+using Chronos.API.Extensions;
 using Chronos.Application.DTOs.Leave;
 using Chronos.Application.IServices;
+using Chronos.Domain.Constants;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
-[Route("api/[controller]")]
-[ApiController]
 [Authorize]
-public class LeaveRequestController : ControllerBase
+[ApiController]
+[Route("api/leave-requests")]
+public class LeaveRequestsController(ILeaveRequestService service) : ControllerBase
 {
-    private readonly ILeaveRequestService _service;
 
-    public LeaveRequestController(ILeaveRequestService service)
+    [HttpPost]
+    [HasPermission(Permissions.LeaveRequest.Create)]
+    public async Task<IActionResult> Create([FromBody] CreateLeaveRequestDto request)
     {
-        _service = service;
+        var employeeId = User.GetEmployeeId();
+
+        var result = await service.CreateRequest(employeeId, request);
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        return Created("", result);
     }
 
-    // 1. Gửi đơn (Nhân viên)
-    [HttpPost("create")]
-    public async Task<IActionResult> Create(CreateLeaveRequestDto request)
+
+    [HttpGet("me")]
+    [HasPermission(Permissions.LeaveRequest.View)]
+    public async Task<IActionResult> GetMyHistory()
     {
-        var employeeId = await GetCurrentEmployeeIdAsync();
-        var result = await _service.CreateRequest(employeeId, request);
-        if (!result.Success) return BadRequest(result);
+        var employeeId = User.GetEmployeeId();
+        var result = await service.GetMyRequests(employeeId);
+
         return Ok(result);
     }
 
-    // 2. Xem lịch sử đơn (Nhân viên)
-    [HttpGet("my-history")]
-    public async Task<IActionResult> GetMyHistory()
-    {
-        var employeeId = await GetCurrentEmployeeIdAsync();
-        return Ok(await _service.GetMyRequests(employeeId));
-    }
-
-    // 3. Xem danh sách chờ (Manager)
     [HttpGet("pending")]
-    // [Authorize(Policy = "Permissions.Leave.View")] // Sau này bật lên
+    [HasPermission(Permissions.LeaveRequest.Approve)]
     public async Task<IActionResult> GetPending()
     {
-        return Ok(await _service.GetPendingRequests());
+        var result = await service.GetPendingRequests();
+        return Ok(result);
     }
 
-    // 4. Duyệt đơn (Manager)
-    [HttpPost("approve")]
-    // [Authorize(Policy = "Permissions.Leave.Approve")]
-    public async Task<IActionResult> Approve(ApproveLeaveRequestDto request)
+
+    [HttpPatch("{id}/approve")]
+    [HasPermission(Permissions.LeaveRequest.Approve)]
+    public async Task<IActionResult> Approve(
+                                             Guid id,
+                                             ApproveLeaveRequestDto request)
     {
-        var managerId = await GetCurrentEmployeeIdAsync();
-        return Ok(await _service.ApproveRequest(managerId, request));
+        var managerId = User.GetEmployeeId();
+
+        var result = await service.ApproveRequest(managerId, id, request);
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        return Ok(result);
     }
 }

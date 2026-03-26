@@ -2,6 +2,8 @@
 using Chronos.Application.DTOs.Department;
 using Chronos.Application.DTOs.Employee;
 using Chronos.Application.DTOs.EmploymentContract;
+using Chronos.Application.DTOs.Leave;
+using Chronos.Application.DTOs.Position;
 using Chronos.Domain.Entity;
 using System;
 using System.Collections.Generic;
@@ -15,7 +17,6 @@ namespace Chronos.Application.Mappings
     {
         public MappingProfile()
         {
-            // Map từ Entity -> DTO (Read)
             CreateMap<Employee, EmployeeDto>().ReverseMap();
             CreateMap<CreateEmployeeDto, Employee>();
 
@@ -24,9 +25,19 @@ namespace Chronos.Application.Mappings
             CreateMap<UpdateDepartmentDto, Department>();
 
             CreateMap<EmploymentContractDto, EmploymentContract>().ReverseMap();
-            CreateMap<EmploymentContractListDto, EmploymentContract>().ReverseMap().ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.Employee.FullName))
-            .ForMember(dest => dest.EmployeeCode, opt => opt.MapFrom(src => src.Employee.EmployeeCode)); ;
-            CreateMap<EmploymentContract,CreateEmploymentContractDto>().ReverseMap();
+            CreateMap<EmploymentContractListDto, EmploymentContract>().ReverseMap().ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.Employee!.FullName))
+            .ForMember(dest => dest.EmployeeCode, opt => opt.MapFrom(src => src.Employee!.EmployeeCode)); ;
+            CreateMap< EmploymentContract, CreateEmploymentContractDto>().ReverseMap();
+
+            CreateMap<CreateLeaveRequestDto, LeaveRequest>();
+            CreateMap<LeaveTypeDto, LeaveType>().ReverseMap();
+            CreateMap<PositionDto, Position>().ReverseMap();
+            CreateMap<LeaveRequest, LeaveRequestDto>().ReverseMap();
+            CreateMap<Position, PositionDto>().ReverseMap();
+            CreateMap<CreatePositionDto, Position>();
+
+
+
 
         }
     }

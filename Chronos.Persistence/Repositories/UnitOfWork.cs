@@ -1,6 +1,7 @@
 ﻿using Chronos.Domain.Entity;
 using Chronos.Domain.Interfaces;
 using Chronos.Persistence.Context;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,10 +18,15 @@ namespace Chronos.Persistence.Repositories
         // Khai báo biến cache cho các Repository cụ thể
         private IEmployeeRepository? _employee;
         private IDepartmentRepository? _department;
-        private IEmploymentContractRepository? _contract;
+        private IEmploymentContractRepository? _employmentContracts;
         private IAttendanceRepository? _attendance;
         private ILeaveTypeRepository? _leaveType;
         private ILeaveRequestRepository? _leaveRequest;
+        private IMenuRepository? _menus;
+        private IPositionRepository? _positions;
+        private IEmployeeTransferRepository? _employeeTransfer;
+        private IContractAnnexRepository? _contractAnnex;
+        private IDepartmentPositionRepository? _departmentPositions;
         public UnitOfWork(ChronosDbContext context)
         {
             _context = context;
@@ -36,9 +42,9 @@ namespace Chronos.Persistence.Repositories
             get { return _department ??= new DepartmentRepository(_context); }
         }
 
-        public IEmploymentContractRepository Contracts
+        public IEmploymentContractRepository EmploymentContracts
         {
-            get { return _contract ??= new EmploymentContractRepository(_context); }
+            get { return _employmentContracts ??= new EmploymentContractRepository(_context); }
         }
 
         public IAttendanceRepository Attendance
@@ -53,12 +59,36 @@ namespace Chronos.Persistence.Repositories
         {
             get { return _leaveRequest ??= new LeaveRequestRepository(_context); }
         }
+        public IMenuRepository Menus
+        {
+            get { return _menus ??= new MenuRepository(_context); }
+        }
+        public IPositionRepository Positions
+        {
+            get { return _positions ??= new PositionRepository(_context); }
+        }
+        public IEmployeeTransferRepository EmployeeTransfers
+        {
+            get { return _employeeTransfer ??= new EmployeeTransferRepository(_context); }
+        } 
+        public IContractAnnexRepository ContractAnnexes
+        {
+            get { return _contractAnnex ??= new ContractAnnexRepository(_context); }
+        }
+        public IDepartmentPositionRepository DepartmentPositions
+        {
+            get { return _departmentPositions ??= new DepartmentPositionRepository(_context); }
+        }
+  
 
         public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();
         }
-
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            return await _context.Database.BeginTransactionAsync();
+        }
         public void Dispose()
         {
             _context.Dispose();

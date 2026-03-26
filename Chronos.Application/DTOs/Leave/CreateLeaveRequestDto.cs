@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Chronos.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -9,9 +10,12 @@ namespace Chronos.Application.DTOs.Leave
 {
     public class CreateLeaveRequestDto
     {
-        public required Guid LeaveTypeId { get; set; } 
-        public required DateTime FromDate { get; set; }
-        public required DateTime ToDate { get; set; }
-        public required string Reason { get; set; }
+        public Guid LeaveTypeId { get; set; }
+        public string? Reason { get; set; }
+        public DateTime FromDate { get; set; }
+        public DateTime ToDate { get; set; }
+        public LeaveSession Session { get; set; } = LeaveSession.AllDay;
     }
+
+
 }

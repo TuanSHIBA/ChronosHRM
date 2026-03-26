@@ -1,38 +1,38 @@
-﻿using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
+﻿using Chronos.API.Attributes;
+using Chronos.Application.Common.Models.Chronos.Application.Common.Models;
 using Chronos.Application.DTOs.EmploymentContract;
 using Chronos.Application.IServices;
+using Chronos.Domain.Constants;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Chronos.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmploymentContractsController (IEmploymentContractService service) : ControllerBase
+    public class EmploymentContractsController(IEmploymentContractService service, IContractAnnexService _contractAnnexService) : ControllerBase
     {
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateEmploymentContractDto request)
+        [HasPermission(Permissions.EmploymentContracts.Create)]
+        public async Task<IActionResult> Create(CreateEmploymentContractDto request)
         {
-            try
-            {
-                var id = await service.CreateAsync(request);
-                return StatusCode(201, new { id });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+
+            var result = await service.CreateAsync(request);
+            if (!result.Success)
+                return BadRequest(result);
+            return CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result);
+
         }
 
-        // GET: api/EmploymentContracts/employee/{employeeId}
         [HttpGet("employee/{employeeId}")]
+        [HasPermission(Permissions.EmploymentContracts.View)]
         public async Task<IActionResult> GetByEmployee(Guid employeeId)
         {
             var result = await service.GetByEmployeeIdAsync(employeeId);
             return Ok(result);
         }
 
-        // GET: api/EmploymentContracts/{id}
         [HttpGet("{id}")]
+        [HasPermission(Permissions.EmploymentContracts.View)]
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await service.GetByIdAsync(id);
@@ -40,15 +40,17 @@ namespace Chronos.API.Controllers
             return Ok(result);
         }
 
-        // GET: api/EmploymentContracts
         [HttpGet]
+        [HasPermission(Permissions.EmploymentContracts.View)]
         public async Task<IActionResult> GetAllContracts()
         {
             var result = await service.GetAllContractsAsync();
             return Ok(result);
         }
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateEmploymentContractDto request)
+        [HasPermission(Permissions.EmploymentContracts.Edit)]
+        public async Task<IActionResult> Update(Guid id, UpdateEmploymentContractDto request)
         {
             if (id != request.Id)
                 return BadRequest(ServiceResponse<EmploymentContractDto>.ErrorResponse("Mã ID không khớp."));
@@ -62,11 +64,29 @@ namespace Chronos.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [HasPermission(Permissions.EmploymentContracts.Delete)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await service.DeleteAsync(id);
             if (!result.Success) return BadRequest(result);
             return Ok(result);
+        }
+
+        [HttpGet("{id}/ContractAnnex")]
+        public async Task<IActionResult> GetByContractId(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return BadRequest(new { Message = "ID hợp đồng không hợp lệ." });
+            }
+
+            var response = await _contractAnnexService.GetByContractIdAsync(id);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
         }
     }
 }

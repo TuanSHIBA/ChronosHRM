@@ -8,8 +8,7 @@ namespace Chronos.Application.DTOs.Leave
 {
     public class ApproveLeaveRequestDto
     {
-        public Guid RequestId { get; set; }
-        public bool IsApproved { get; set; } // True = Duyệt, False = Từ chối
+        public bool IsApproved { get; set; }
         public string? ManagerNote { get; set; }
     }
 }
